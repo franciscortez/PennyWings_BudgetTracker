@@ -144,7 +144,9 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
                     className="w-full px-4 py-3 bg-pink-50/50 border border-pink-100 rounded-xl focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 outline-none transition-all font-bold text-gray-700 text-sm"
                   >
                     <option value="">Select Wallet</option>
-                    {wallets.map(w => <option key={w.id} value={w.id}>{w.wallet_name}</option>)}
+                    {wallets.filter(w => w.wallet_type !== 'cash').map(w => (
+                      <option key={w.id} value={w.id}>{w.wallet_name}</option>
+                    ))}
                   </select>
                 ) : (
                   <div className={`px-4 py-3 border rounded-xl text-sm font-bold ${
