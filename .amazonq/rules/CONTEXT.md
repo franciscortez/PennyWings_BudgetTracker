@@ -131,6 +131,8 @@ Real-time sync across devices
 - **ESLint** - Code linting with React-specific rules
 - **@vitejs/plugin-react** - React Fast Refresh support
 - **Node.js** - Runtime environment
+- **Supabase MCP Server** - Infrastructure and backend management
+- **Netlify MCP** - Automated deployment and site management
 
 ---
 
@@ -600,6 +602,22 @@ VITE_SUPABASE_ANON_KEY=
 3. Click category to see detailed transactions
 4. Adjust budget limits as needed
 5. Real-time updates as transactions are added
+
+---
+
+## Deployment
+
+### Hosting
+
+- **Netlify** - Production hosting platform (PennyWings is live at [penny-wings.netlify.app](https://penny-wings.netlify.app/))
+- **Continuous Deployment** - Integrated with GitHub and managed via Netlify MCP
+
+### Deployment Workflow
+
+1. **Backend Updates**: Apply database migrations using Supabase MCP (`apply_migration`).
+2. **Frontend Build**: Test the production build locally with `npm run build`.
+3. **Production Deployment**: Deploy the latest build to Netlify using Netlify MCP (`deploy-site`).
+4. **Environment Management**: Sync environment variables between Supabase and Netlify using Netlify MCP (`manage-env-vars`).
 
 ---
 

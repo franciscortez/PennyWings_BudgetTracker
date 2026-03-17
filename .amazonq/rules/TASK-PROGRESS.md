@@ -136,6 +136,23 @@ This document tracks the development progress of the Budget Tracker application 
 ---
 ```
 
+### Documentation & Deployment Setup - 2026-03-17
+**Status:** ✅ Completed
+
+**Description:**
+Updated project documentation (`RULES.md`, `CONTEXT.md`, `TASK-PROGRESS.md`) to integrate Supabase and Netlify MCP servers into the development and deployment workflow. Added a central "Deployment" section in `CONTEXT.md`.
+
+**Files Modified/Created:**
+- `.amazonq/rules/RULES.md` (Added MCP rules)
+- `.amazonq/rules/CONTEXT.md` (Added MCP tools and Deployment section)
+- `.amazonq/rules/TASK-PROGRESS.md` (Updated history)
+
+**Outcome:**
+- AI agents are now explicitly instructed to use Supabase and Netlify MCP servers for backend and deployment tasks.
+- Project context now includes a clear deployment workflow using these tools.
+
+---
+
 ### Accounts & Transactions Improvement - 2026-03-17
 **Status:** ✅ Completed
 
@@ -349,6 +366,11 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 
 ## 🔄 Active Development Phases
 
+1.  **Phase 4: Bank Cards & E-Wallets** - ✅ COMPLETED <!-- id: 19 -->
+2.  **Phase 5: Transactions Module** - ✅ COMPLETED (except receipt upload) <!-- id: 20 -->
+3.  **Phase 7: Dashboard** - ✅ COMPLETED <!-- id: 21 -->
+4.  **Phase 8: Enhancements** - ⏸️ ON HOLD <!-- id: 22 -->
+
 ### Phase 1: Foundation ✅
 
 **Goal:** Set up core infrastructure (Supabase, Tailwind with pink theme, folder structure)
@@ -444,24 +466,24 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 
 ---
 
-### Phase 4: Bank Cards & E-Wallets Module 🔄
+### Phase 4: Bank Cards & E-Wallets Module ✅
 
 **Goal:** Build bank card and e-wallet management with balance tracking
 
 **Tasks:**
 
-- [ ] Create accounts page with tabs for cards and e-wallets
-- [ ] Build add/edit card form (name, type, balance, limit, color)
-- [ ] Build add/edit e-wallet form (name, type, identifier, balance, color)
-- [ ] Implement card type selection (credit/debit/savings)
-- [ ] Implement e-wallet type selection (PayPal/GCash/Venmo/CashApp/Other)
-- [ ] Add balance display and tracking for both
-- [ ] Implement credit limit for credit cards
-- [ ] Add color picker for visual identification
-- [ ] Create archive/activate functionality
-- [ ] Calculate and display total balance across all accounts
-- [ ] Add account-specific transaction history view
-- [ ] Implement real-time balance updates
+- [x] Create accounts page with tabs for cards and e-wallets
+- [x] Build add/edit card form (name, type, balance, limit, color)
+- [x] Build add/edit e-wallet form (name, type, identifier, balance, color)
+- [x] Implement card type selection (credit/debit/savings)
+- [x] Implement e-wallet type selection (PayPal/GCash/Venmo/CashApp/Other)
+- [x] Add balance display and tracking for both
+- [x] Implement credit limit for credit cards
+- [x] Add color picker for visual identification
+- [x] Create archive/activate functionality
+- [x] Calculate and display total balance across all accounts
+- [x] Add account-specific transaction history view
+- [x] Implement real-time balance updates
 
 **Files to Create:**
 
@@ -491,26 +513,26 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 
 ---
 
-### Phase 5: Transactions Module ⏸️
+### Phase 5: Transactions Module ✅
 
 **Goal:** Build transaction management with card/wallet linking
 
 **Tasks:**
 
-- [ ] Create transactions list page with account info
-- [ ] Build add/edit transaction form
-- [ ] Implement payment method dropdown (Cash/Card/E-Wallet)
-- [ ] Add card selection dropdown (when Card is selected)
-- [ ] Add e-wallet selection dropdown (when E-Wallet is selected)
-- [ ] Add category selection
-- [ ] Create income/expense/withdrawal toggle
-- [ ] Implement date picker
+- [x] Create transactions list page with account info
+- [x] Build add/edit transaction form
+- [x] Implement payment method dropdown (Cash/Card/E-Wallet)
+- [x] Add card selection dropdown (when Card is selected)
+- [x] Add e-wallet selection dropdown (when E-Wallet is selected)
+- [x] Add category selection
+- [x] Create income/expense/withdrawal toggle
+- [x] Implement date picker
 - [ ] Add receipt upload functionality
-- [ ] Build filter system (by card, wallet, category, date range, payment method)
-- [ ] Auto-update account balance on transaction save
-- [ ] Display transaction history per card/wallet
-- [ ] Implement transaction search
-- [ ] Add transaction deletion with balance rollback
+- [x] Build filter system (by card, wallet, category, date range, payment method)
+- [x] Auto-update account balance on transaction save
+- [x] Display transaction history per card/wallet
+- [x] Implement transaction search
+- [x] Add transaction deletion with balance rollback
 
 **Files to Create:**
 
@@ -582,18 +604,18 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 
 ---
 
-### Phase 7: Dashboard ⏸️
+### Phase 7: Dashboard ✅
 
 **Goal:** Create overview dashboard with analytics
 
 **Tasks:**
 
-- [ ] Build dashboard layout
-- [ ] Create financial overview cards
-- [ ] Display total balance across all cards and e-wallets
-- [ ] Add bank cards and e-wallets quick view widget
-- [ ] Show recent transactions with card/wallet info
-- [ ] Display budget progress indicators
+- [x] Build dashboard layout
+- [x] Create financial overview cards
+- [x] Display total balance across all cards and e-wallets
+- [x] Add bank cards and e-wallets quick view widget
+- [x] Show recent transactions with card/wallet info
+- [x] Display budget progress indicators
 - [ ] Show goals progress
 - [ ] Create monthly spending by card/wallet chart
 - [ ] Add income vs expenses chart

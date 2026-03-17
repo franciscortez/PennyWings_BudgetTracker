@@ -63,6 +63,9 @@ Update this progress as you move through the work.
 - 💬 Be explicit about uncertainties and assumptions
 - 📋 Keep output structured and easy to scan
 - 🤔 If the task is ambiguous, first infer the most likely intent from the codebase and state your reasoning
+- 🚀 **Always leverage Available MCP Servers** for infrastructure and deployment tasks:
+    - **Supabase MCP**: Use for database migrations (`apply_migration`), executing SQL (`execute_sql`), managing Edge Functions (`deploy_edge_function`), and checking logs.
+    - **Netlify MCP**: Use for managing site deployments (`deploy-site`), configuring environment variables (`manage-env-vars`), and checking deployment status.
 
 ---
 
