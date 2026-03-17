@@ -1,5 +1,5 @@
 import React from 'react'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
+import Icon from '../Icon'
 
 export default function WalletItem({ wallet, onEdit, onDelete }) {
   const bgColor = wallet.color || '#FFB6C1'
@@ -26,8 +26,8 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
                 {wallet.wallet_name}
               </h3>
             </div>
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30">
-              <span className="text-xl">📱</span>
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2">
+              <Icon name="wallet" color="white" />
             </div>
           </div>
           
@@ -54,14 +54,14 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
             className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-all"
             title="Edit Wallet"
           >
-            <PencilSquareIcon className="w-5 h-5" />
+            <Icon name="edit" color="currentColor" className="w-5 h-5" />
           </button>
           <button 
             onClick={() => onDelete(wallet.id)}
             className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
             title="Delete Wallet"
           >
-            <TrashIcon className="w-5 h-5" />
+            <Icon name="delete" color="currentColor" className="w-5 h-5" />
           </button>
         </div>
         

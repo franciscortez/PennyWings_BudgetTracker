@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import Swal from 'sweetalert2'
 
 export default function Signup() {
   const { signUp } = useAuth();
@@ -19,19 +20,79 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (form.password !== form.confirm)
-      return setError("Passwords do not match.");
-    if (form.password.length < 6)
-      return setError("Password must be at least 6 characters.");
-    if (!acceptedTerms)
-      return setError("You must accept the Terms and Agreement.");
+    setMessage("");
+
+    const email = form.email.trim();
+    const password = form.password;
+    const confirm = form.confirm;
+
+    if (password !== confirm) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Passwords do not match.',
+        confirmButtonColor: '#EC4899',
+        customClass: { popup: 'rounded-[2.5rem]' }
+      });
+      return;
+    }
+    
+    if (password.length < 6) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Password must be at least 6 characters.',
+        confirmButtonColor: '#EC4899',
+        customClass: { popup: 'rounded-[2.5rem]' }
+      });
+      return;
+    }
+    
+    if (!acceptedTerms) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Terms Required',
+        text: 'You must accept the Terms and Agreement.',
+        confirmButtonColor: '#EC4899',
+        customClass: { popup: 'rounded-[2.5rem]' }
+      });
+      return;
+    }
+
     setLoading(true);
-    const { error } = await signUp(form.email, form.password);
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      setMessage("Check your email to confirm your account!");
+    try {
+      const { error: signUpError } = await signUp(email, password);
+      if (signUpError) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Signup Failed',
+          text: signUpError.message,
+          confirmButtonColor: '#EC4899',
+          customClass: { popup: 'rounded-[2.5rem]' }
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Account Created!',
+          text: 'Please check your email to confirm your account before signing in.',
+          confirmButtonColor: '#EC4899',
+          customClass: { popup: 'rounded-[2.5rem]' }
+        }).then(() => {
+          setForm({ email: "", password: "", confirm: "" });
+          setAcceptedTerms(false);
+          navigate("/login");
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Unexpected Error',
+        text: 'An unexpected error occurred. Please try again.',
+        confirmButtonColor: '#EC4899',
+        customClass: { popup: 'rounded-[2.5rem]' }
+      });
+      console.error(err);
+    } finally {
       setLoading(false);
     }
   };
@@ -225,7 +286,7 @@ export default function Signup() {
                   ) : (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   )}
                 </button>

@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
-import Home from './pages/home/Home'
+import Home from './pages/Home'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import ForgotPassword from './pages/auth/ForgotPassword'
 import ResetPassword from './pages/auth/ResetPassword'
-import Dashboard from './pages/dashboard/Dashboard'
-import Transactions from './pages/transactions/Transactions'
-import Accounts from './pages/accounts/Accounts'
+import Dashboard from './pages/Dashboard'
+import Transactions from './pages/Transactions'
+import Accounts from './pages/Accounts'
 import TermsAndAgreement from './pages/auth/TermsAndAgreement'
 
 export default function App() {

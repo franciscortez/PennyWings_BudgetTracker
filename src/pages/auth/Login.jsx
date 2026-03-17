@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import Swal from 'sweetalert2'
 
 export default function Login() {
   const { signIn } = useAuth();
@@ -17,9 +18,15 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await signIn(form.email, form.password);
-    if (error) {
-      setError(error.message);
+    const { error: signInError } = await signIn(form.email, form.password);
+    if (signInError) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: signInError.message,
+        confirmButtonColor: '#EC4899',
+        customClass: { popup: 'rounded-[2.5rem]' }
+      });
       setLoading(false);
     } else {
       setLoading(false);

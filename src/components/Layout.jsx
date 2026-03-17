@@ -1,46 +1,74 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { 
-  HomeIcon, 
-  CreditCardIcon, 
-  ArrowsRightLeftIcon, 
-  ChartBarIcon, 
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon
-} from '@heroicons/react/24/outline'
+import Icon from './Icon'
+import Swal from 'sweetalert2'
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Accounts', href: '/accounts', icon: CreditCardIcon },
-  { name: 'Transactions', href: '/transactions', icon: ArrowsRightLeftIcon },
+  { name: 'Dashboard', href: '/dashboard', icon: 'bank' },
+  { name: 'Accounts', href: '/accounts', icon: 'card' },
+  { name: 'Transactions', href: '/transactions', icon: 'clock' },
 ]
 
 export default function Layout({ children }) {
   const { user, signOut } = useAuth()
   const location = useLocation()
 
+  const handleLogout = () => {
+    Swal.fire({
+      title: 'Wait! Leaving?',
+      text: "Are you sure you want to sign out? Your pennies will miss you!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#EC4899', // pink-500
+      cancelButtonColor: '#94A3B8', // slate-400
+      confirmButtonText: 'Yes, Log Me Out',
+      cancelButtonText: 'Cancel',
+      background: '#fff',
+      borderRadius: '2rem',
+      customClass: {
+        popup: 'rounded-[2.5rem] p-8 font-bold',
+        title: 'text-2xl font-black text-gray-900',
+        confirmButton: 'rounded-2xl px-8 py-4 px-10 font-black tracking-tight',
+        cancelButton: 'rounded-2xl px-8 py-4 font-black tracking-tight'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        signOut()
+      }
+    })
+  }
+
   return (
     <div className="min-h-screen bg-pink-50 flex flex-col md:flex-row">
       {/* Mobile Header */}
       <div className="md:hidden bg-white px-4 py-3 flex items-center justify-between shadow-sm border-b border-pink-100">
-        <Link to="/" className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
             </svg>
           </div>
           <span className="font-bold text-gray-800 tracking-tight">PennyWings</span>
-        </Link>
-        <button className="text-gray-500 p-1">
-          <UserCircleIcon className="w-7 h-7" />
-        </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500">
+            <Icon name="user" className="w-5 h-5" />
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="p-2 text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
+            title="Sign Out"
+          >
+            <Icon name="logout" className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Sidebar (Desktop) */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-pink-100 h-screen sticky top-0">
         <div className="p-6">
-          <Link to="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-200">
               <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
@@ -49,7 +77,7 @@ export default function Layout({ children }) {
             <span className="text-xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent tracking-tight">
               PennyWings
             </span>
-          </Link>
+          </div>
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-1">
@@ -65,7 +93,7 @@ export default function Layout({ children }) {
                     : 'text-gray-500 hover:bg-pink-50/50 hover:text-pink-500'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
+                <Icon name={item.icon} color="currentColor" className="w-5 h-5" />
                 {item.name}
               </Link>
             )
@@ -75,17 +103,19 @@ export default function Layout({ children }) {
         <div className="p-4 border-t border-pink-50">
           <div className="bg-pink-50 rounded-2xl p-4 mb-4">
             <div className="flex items-center gap-3 mb-1">
-              <UserCircleIcon className="w-10 h-10 text-pink-400" />
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center p-2 text-pink-400">
+                <Icon name="user" color="currentColor" />
+              </div>
               <div className="overflow-hidden">
                 <p className="text-sm font-bold text-gray-800 truncate">{user?.email?.split('@')[0]}</p>
               </div>
             </div>
           </div>
           <button 
-            onClick={() => signOut()}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors text-sm font-medium"
           >
-            <ArrowRightOnRectangleIcon className="w-5 h-5" />
+            <Icon name="logout" className="w-5 h-5" />
             Sign Out
           </button>
         </div>
@@ -110,7 +140,7 @@ export default function Layout({ children }) {
                 isActive ? 'text-pink-600' : 'text-gray-400'
               }`}
             >
-              <item.icon className="w-6 h-6" />
+              <Icon name={item.icon} color="currentColor" className="w-6 h-6" />
               <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">{item.name}</span>
             </Link>
           )

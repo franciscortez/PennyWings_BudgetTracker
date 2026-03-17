@@ -1,20 +1,14 @@
 import React, { useMemo } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import Layout from "../../components/Layout";
-import { useBankCards } from "../../hooks/useBankCards";
-import { useEWallets } from "../../hooks/useEWallets";
-import { useTransactions } from "../../hooks/useTransactions";
-import { 
-  ArrowUpIcon, 
-  ArrowDownIcon, 
-  BanknotesIcon,
-  ClockIcon,
-  ChevronRightIcon
-} from "@heroicons/react/24/outline";
+import { useAuth } from "../contexts/AuthContext";
+import Layout from "../components/Layout";
+import { useBankCards } from "../hooks/useBankCards";
+import { useEWallets } from "../hooks/useEWallets";
+import { useTransactions } from "../hooks/useTransactions";
 import { Link } from "react-router-dom";
+import Icon from "../components/Icon";
 
 export default function Dashboard() {
-  useAuth();
+  const { user } = useAuth();
   const { cards } = useBankCards();
   const { wallets } = useEWallets();
   const { transactions, loading: loadingTx } = useTransactions(5);
@@ -66,7 +60,7 @@ export default function Dashboard() {
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-8">
                 <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30">
-                  <BanknotesIcon className="w-8 h-8 text-white" />
+                  <Icon name="bank" color="white" className="w-8 h-8" />
                 </div>
                 <p className="text-sm font-black uppercase tracking-[0.2em] opacity-80">Total Net Worth</p>
               </div>
@@ -76,14 +70,14 @@ export default function Dashboard() {
               <div className="flex gap-10">
                 <div>
                   <div className="flex items-center gap-2 opacity-80 mb-1">
-                    <ArrowDownIcon className="w-4 h-4 text-emerald-300" />
+                    <Icon name="income" color="#6EE7B7" className="w-4 h-4" />
                     <p className="text-xs font-bold uppercase tracking-widest">Monthly Income</p>
                   </div>
                   <p className="text-2xl font-black">₱{stats.income.toLocaleString()}</p>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 opacity-80 mb-1">
-                    <ArrowUpIcon className="w-4 h-4 text-rose-300" />
+                    <Icon name="expense" color="#FDA4AF" className="w-4 h-4" />
                     <p className="text-xs font-bold uppercase tracking-widest">Monthly Expenses</p>
                   </div>
                   <p className="text-2xl font-black">₱{stats.expenses.toLocaleString()}</p>
@@ -116,14 +110,14 @@ export default function Dashboard() {
               
               <div className="grid grid-cols-2 gap-4">
                 <Link to="/accounts" className="p-6 bg-white border border-pink-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-2 hover:shadow-xl hover:translate-y-[-4px] transition-all group">
-                  <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-colors">
-                    <BanknotesIcon className="w-6 h-6" />
+                  <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center group-hover:bg-pink-500 transition-colors">
+                    <Icon name="bank" color="currentColor" className="w-6 h-6 group-hover:text-white" />
                   </div>
                   <span className="text-xs font-black text-gray-800 uppercase tracking-tighter">Accounts</span>
                 </Link>
                 <Link to="/transactions" className="p-6 bg-white border border-pink-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-2 hover:shadow-xl hover:translate-y-[-4px] transition-all group">
                   <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-colors">
-                    <ClockIcon className="w-6 h-6" />
+                    <Icon name="clock" color="currentColor" className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-black text-gray-800 uppercase tracking-tighter">Activity</span>
                 </Link>
@@ -136,12 +130,12 @@ export default function Dashboard() {
         <div className="bg-white rounded-[3.5rem] p-10 border border-pink-50 shadow-sm">
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-              <ClockIcon className="w-7 h-7 text-pink-500" />
+              <Icon name="clock" color="#EC4899" className="w-7 h-7" />
               Recent Activity
             </h3>
             <Link to="/transactions" className="text-sm font-black text-pink-500 hover:text-pink-600 flex items-center gap-1 group">
               View All History
-              <ChevronRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Icon name="plus" color="currentColor" className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -155,10 +149,13 @@ export default function Dashboard() {
               transactions.map(tx => (
                 <div key={tx?.id} className="flex items-center gap-5 p-5 bg-white border border-pink-50 rounded-[2.5rem] hover:shadow-xl hover:translate-x-2 transition-all group">
                   <div 
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform"
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center p-4 shadow-sm group-hover:scale-110 transition-transform"
                     style={{ backgroundColor: tx?.category?.color || '#F3F4F6' }}
                   >
-                    {tx?.type === 'income' ? '💰' : '💸'}
+                    <Icon 
+                      name={tx?.type === 'income' ? 'income' : 'expense'} 
+                      color="white" 
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-lg font-black text-gray-900 truncate tracking-tight">{tx?.description || tx?.category?.name || 'Uncategorized'}</p>

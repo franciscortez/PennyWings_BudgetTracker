@@ -1,5 +1,5 @@
 import React from 'react'
-import { PencilSquareIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import Icon from '../Icon'
 
 export default function CardItem({ card, onEdit, onDelete }) {
   const bgColor = card.color || '#F472B6' // Default pink-400
@@ -27,8 +27,8 @@ export default function CardItem({ card, onEdit, onDelete }) {
                 {card.card_name}
               </h3>
             </div>
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30">
-              <span className="text-xl">💳</span>
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2">
+              <Icon name="card" color="white" />
             </div>
           </div>
           
@@ -56,14 +56,14 @@ export default function CardItem({ card, onEdit, onDelete }) {
             className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-all"
             title="Edit Card"
           >
-            <PencilSquareIcon className="w-5 h-5" />
+            <Icon name="edit" color="currentColor" className="w-5 h-5" />
           </button>
           <button 
             onClick={() => onDelete(card.id)}
             className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
             title="Delete Card"
           >
-            <TrashIcon className="w-5 h-5" />
+            <Icon name="delete" color="currentColor" className="w-5 h-5" />
           </button>
         </div>
         

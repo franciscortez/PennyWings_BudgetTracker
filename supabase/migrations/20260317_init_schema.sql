@@ -138,3 +138,9 @@ INSERT INTO public.categories (name, type, icon, color, is_default) VALUES
 ('Health', 'expense', 'heart', '#F43F5E', true),
 ('Travel', 'expense', 'plane', '#FDA4AF', true),
 ('Education', 'expense', 'book', '#E11D48', true);
+
+-- 8. Enable Real-time for specific tables
+-- This allows the Supabase client to listen for changes to these tables
+ALTER PUBLICATION supabase_realtime ADD TABLE public.bank_cards;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.e_wallets;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.transactions;

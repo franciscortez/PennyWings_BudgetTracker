@@ -1,5 +1,5 @@
 import React from 'react'
-import { PlusIcon } from '@heroicons/react/24/outline'
+import Icon from '../Icon'
 
 export default function TotalBalance({ total, onAddClick }) {
   return (
@@ -24,7 +24,7 @@ export default function TotalBalance({ total, onAddClick }) {
           className="bg-white text-pink-600 px-6 py-3 rounded-2xl font-bold shadow-sm hover:bg-pink-50 transition-all flex items-center justify-center gap-2 group whitespace-nowrap"
         >
           <div className="bg-pink-100 rounded-lg p-1 group-hover:bg-pink-200 transition-colors">
-            <PlusIcon className="w-5 h-5" />
+            <Icon name="plus" color="currentColor" className="w-5 h-5" />
           </div>
           Add New Account
         </button>

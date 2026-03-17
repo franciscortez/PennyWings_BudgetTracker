@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { XMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
-
-const COLORS = [
-  '#F472B6', '#EC4899', '#DB2777', '#BE185D', 
-  '#9333EA', '#8B5CF6', '#6366F1', '#3B82F6', 
-  '#10B981', '#F59E0B', '#EF4444', '#1F2937'
-]
+import Icon from '../Icon'
 
 const ACCOUNT_TYPES = [
-  { id: 'digital', label: 'Digital Bank', icon: '📱' },
-  { id: 'ewallet', label: 'E-Wallet', icon: '👛' },
-  { id: 'traditional', label: 'Traditional Bank', icon: '🏛️' },
+  { id: 'traditional', label: 'Traditional Bank', icon: 'traditional' },
+  { id: 'digital', label: 'Digital Bank', icon: 'digital' },
+  { id: 'ewallet', label: 'E-Wallet', icon: 'ewallet' },
 ]
 
 const PROVIDERS = {
@@ -26,21 +20,21 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
     provider: '',
     account_name: '',
     balance: '',
-    color: COLORS[1],
     last_four: '', // for banks
     account_identifier: '', // for ewallets
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (isOpen) {
       setStep(1)
+      setError(null)
       setFormData({
         type: '',
         provider: '',
         account_name: '',
         balance: '',
-        color: COLORS[1],
         last_four: '',
         account_identifier: '',
       })
@@ -55,26 +49,26 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
     try {
       const isEWallet = formData.type === 'ewallet'
       const finalData = isEWallet ? {
         wallet_name: formData.account_name || formData.provider,
-        wallet_type: formData.provider.toLowerCase().replace(' ', ''),
+        wallet_type: formData.provider,
         balance: Number(formData.balance) || 0,
-        account_identifier: formData.account_identifier,
-        color: formData.color
+        account_identifier: formData.account_identifier
       } : {
         card_name: formData.account_name || formData.provider,
         card_type: formData.type === 'traditional' ? 'savings' : 'debit',
         balance: Number(formData.balance) || 0,
-        last_four: formData.last_four,
-        color: formData.color
+        last_four: formData.last_four
       }
       
       await onSubmit(formData.type, finalData)
       onClose()
-    } catch (error) {
-      console.error('Error creating account:', error)
+    } catch (err) {
+      console.error('Error creating account:', err)
+      setError(err.message || 'Failed to create account. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -89,7 +83,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
             <div className="flex items-center gap-2">
               {step > 1 && (
                 <button onClick={handleBack} className="p-2 hover:bg-pink-50 rounded-full text-gray-400 transition-colors">
-                  <ChevronLeftIcon className="w-5 h-5" />
+                  <Icon name="plus" color="currentColor" className="w-4 h-4 rotate-45" /> 
                 </button>
               )}
               <h2 className="text-2xl font-black text-gray-800 tracking-tight">
@@ -97,7 +91,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
               </h2>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-pink-50 rounded-full text-gray-400 transition-colors">
-              <XMarkIcon className="w-6 h-6" />
+              <Icon name="x" color="currentColor" className="w-6 h-6" />
             </button>
           </div>
 
@@ -113,6 +107,12 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
             ))}
           </div>
 
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-bold animate-in fade-in slide-in-from-top-2">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 1 && (
               <div className="space-y-4">
@@ -126,10 +126,12 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
                         setFormData({ ...formData, type: type.id })
                         handleNext()
                       }}
-                      className="flex items-center gap-4 p-5 bg-pink-50/50 border-2 border-transparent hover:border-pink-200 hover:bg-white rounded-3xl transition-all group text-left"
+                      className="flex items-center gap-6 p-6 bg-pink-50/50 border-2 border-transparent hover:border-pink-200 hover:bg-white rounded-[2.5rem] transition-all group text-left"
                     >
-                      <span className="text-3xl group-hover:scale-125 transition-transform">{type.icon}</span>
-                      <span className="text-lg font-bold text-gray-700">{type.label}</span>
+                      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center p-3 shadow-sm group-hover:scale-110 transition-transform">
+                        <Icon name={type.icon} color="#EC4899" />
+                      </div>
+                      <span className="text-xl font-bold text-gray-700">{type.label}</span>
                     </button>
                   ))}
                 </div>
@@ -213,23 +215,6 @@ export default function AccountWizard({ isOpen, onClose, onSubmit }) {
                       onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
                       className="w-full pl-16 pr-6 py-8 bg-pink-50/50 border-2 border-pink-100 rounded-[2.5rem] focus:border-pink-500 outline-none transition-all text-4xl font-black text-gray-800 text-center placeholder:text-pink-100"
                     />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-4 ml-1">Pick a theme</label>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    {COLORS.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, color })}
-                        className={`w-10 h-10 rounded-2xl transition-all transform hover:scale-110 ${
-                          formData.color === color ? 'ring-4 ring-pink-500/20 scale-110' : ''
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
                   </div>
                 </div>
 

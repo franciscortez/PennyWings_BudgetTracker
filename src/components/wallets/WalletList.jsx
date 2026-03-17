@@ -2,7 +2,7 @@ import React from 'react'
 import WalletItem from './WalletItem'
 import { WalletIcon } from '@heroicons/react/24/outline'
 
-export default function WalletList({ wallets, loading, onEdit, onDelete, onAddClick }) {
+export default function WalletList({ wallets, loading, onEdit, onDelete }) {
   if (loading) {
     return (
       <div className="col-span-full py-20 flex flex-col items-center justify-center">
@@ -22,12 +22,6 @@ export default function WalletList({ wallets, loading, onEdit, onDelete, onAddCl
         <p className="text-gray-500 mb-8 max-w-xs mx-auto">
           Connect your PayPal, GCash, or Venmo accounts to keep track of every penny.
         </p>
-        <button 
-          onClick={onAddClick}
-          className="bg-pink-500 text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-pink-200 hover:bg-pink-600 transition-all active:scale-95"
-        >
-          + Add E-Wallet
-        </button>
       </div>
     )
   }
