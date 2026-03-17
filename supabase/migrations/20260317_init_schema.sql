@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS public.bank_cards (
   card_type TEXT CHECK (card_type IN ('credit', 'debit', 'savings')) NOT NULL,
   last_four TEXT,
   balance DECIMAL(15, 2) DEFAULT 0.00 NOT NULL,
-  credit_limit DECIMAL(15, 2),
   color TEXT,
   is_active BOOLEAN DEFAULT true NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,

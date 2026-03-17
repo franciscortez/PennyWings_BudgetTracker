@@ -1,0 +1,121 @@
+import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { 
+  HomeIcon, 
+  CreditCardIcon, 
+  ArrowsRightLeftIcon, 
+  ChartBarIcon, 
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon
+} from '@heroicons/react/24/outline'
+
+const navigation = [
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Accounts', href: '/accounts', icon: CreditCardIcon },
+  { name: 'Transactions', href: '/transactions', icon: ArrowsRightLeftIcon },
+]
+
+export default function Layout({ children }) {
+  const { user, signOut } = useAuth()
+  const location = useLocation()
+
+  return (
+    <div className="min-h-screen bg-pink-50 flex flex-col md:flex-row">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white px-4 py-3 flex items-center justify-between shadow-sm border-b border-pink-100">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+            </svg>
+          </div>
+          <span className="font-bold text-gray-800 tracking-tight">PennyWings</span>
+        </Link>
+        <button className="text-gray-500 p-1">
+          <UserCircleIcon className="w-7 h-7" />
+        </button>
+      </div>
+
+      {/* Sidebar (Desktop) */}
+      <aside className="hidden md:flex flex-col w-64 bg-white border-r border-pink-100 h-screen sticky top-0">
+        <div className="p-6">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-200">
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" />
+              </svg>
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent tracking-tight">
+              PennyWings
+            </span>
+          </Link>
+        </div>
+
+        <nav className="flex-1 px-4 py-4 space-y-1">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                  isActive 
+                    ? 'bg-pink-50 text-pink-600 shadow-sm shadow-pink-100' 
+                    : 'text-gray-500 hover:bg-pink-50/50 hover:text-pink-500'
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="p-4 border-t border-pink-50">
+          <div className="bg-pink-50 rounded-2xl p-4 mb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <UserCircleIcon className="w-10 h-10 text-pink-400" />
+              <div className="overflow-hidden">
+                <p className="text-sm font-bold text-gray-800 truncate">{user?.email?.split('@')[0]}</p>
+              </div>
+            </div>
+          </div>
+          <button 
+            onClick={() => signOut()}
+            className="w-full flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors text-sm font-medium"
+          >
+            <ArrowRightOnRectangleIcon className="w-5 h-5" />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 w-full relative">
+        <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12">
+          {children}
+        </div>
+      </main>
+
+      {/* Mobile Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-pink-100 flex justify-around p-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        {navigation.map((item) => {
+          const isActive = location.pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+                isActive ? 'text-pink-600' : 'text-gray-400'
+              }`}
+            >
+              <item.icon className="w-6 h-6" />
+              <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">{item.name}</span>
+            </Link>
+          )
+        })}
+      </nav>
+    </div>
+  )
+}

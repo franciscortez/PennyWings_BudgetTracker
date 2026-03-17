@@ -8,6 +8,7 @@ import ForgotPassword from './pages/auth/ForgotPassword'
 import ResetPassword from './pages/auth/ResetPassword'
 import Dashboard from './pages/dashboard/Dashboard'
 import Transactions from './pages/transactions/Transactions'
+import Accounts from './pages/accounts/Accounts'
 import TermsAndAgreement from './pages/auth/TermsAndAgreement'
 
 export default function App() {
@@ -26,6 +27,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/accounts"
+            element={
+              <ProtectedRoute>
+                <Accounts />
               </ProtectedRoute>
             }
           />

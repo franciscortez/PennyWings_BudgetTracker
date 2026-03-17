@@ -1,42 +1,190 @@
+import React, { useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import Layout from "../../components/Layout";
+import { useBankCards } from "../../hooks/useBankCards";
+import { useEWallets } from "../../hooks/useEWallets";
+import { useTransactions } from "../../hooks/useTransactions";
+import { 
+  ArrowUpIcon, 
+  ArrowDownIcon, 
+  BanknotesIcon,
+  ClockIcon,
+  ChevronRightIcon
+} from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
-  const { user, signOut } = useAuth();
+  useAuth();
+  const { cards } = useBankCards();
+  const { wallets } = useEWallets();
+  const { transactions, loading: loadingTx } = useTransactions(5);
+
+  const totalBalance = useMemo(() => {
+    const cardTotal = cards.reduce((sum, card) => sum + Number(card.balance || 0), 0);
+    const walletTotal = wallets.reduce((sum, wallet) => sum + Number(wallet.balance || 0), 0);
+    return cardTotal + walletTotal;
+  }, [cards, wallets]);
+
+  const stats = useMemo(() => {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+
+    return (transactions || []).reduce((acc, tx) => {
+      if (!tx || !tx.transaction_date) return acc;
+      
+      const txDate = new Date(tx.transaction_date);
+      if (txDate.getMonth() === thisMonth && txDate.getFullYear() === thisYear) {
+        const amount = Number(tx.amount || 0);
+        if (tx.type === 'income') acc.income += amount;
+        else if (tx.type === 'expense') acc.expenses += amount;
+      }
+      return acc;
+    }, { income: 0, expenses: 0 });
+  }, [transactions]);
 
   return (
-    <div className="min-h-screen bg-pink-50 p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm">
+    <Layout>
+      <div className="space-y-10 pb-20">
+        {/* Header */}
+        <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-            <p className="text-gray-500">Welcome back, {user?.email}</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">My PennyWings</h1>
+            <p className="text-gray-500 font-medium italic">"Every penny has wings, keep them flying in the right direction."</p>
           </div>
-          <button
-            onClick={() => signOut()}
-            className="px-4 py-2 bg-pink-100 hover:bg-pink-200 text-pink-700 rounded-lg font-medium transition"
-          >
-            Sign Out
-          </button>
+          <div className="hidden md:block text-right">
+            <p className="text-xs font-black text-pink-400 uppercase tracking-widest mb-1">Current Date</p>
+            <p className="text-lg font-bold text-gray-800">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-48 flex flex-col justify-center items-center">
-            <span className="text-4xl mb-2">💳</span>
-            <p className="text-gray-500 font-medium">Bank Cards & Wallets</p>
-            <p className="text-xs text-gray-400 mt-1">(Coming Soon)</p>
+
+        {/* Main Stats Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Total Balance Card */}
+          <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-pink-500 to-pink-600 rounded-[3rem] p-10 text-white shadow-2xl shadow-pink-200 group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-10 translate-y-[-20px] blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30">
+                  <BanknotesIcon className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-sm font-black uppercase tracking-[0.2em] opacity-80">Total Net Worth</p>
+              </div>
+              <h2 className="text-6xl font-black tracking-tighter mb-10">
+                ₱{totalBalance.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+              </h2>
+              <div className="flex gap-10">
+                <div>
+                  <div className="flex items-center gap-2 opacity-80 mb-1">
+                    <ArrowDownIcon className="w-4 h-4 text-emerald-300" />
+                    <p className="text-xs font-bold uppercase tracking-widest">Monthly Income</p>
+                  </div>
+                  <p className="text-2xl font-black">₱{stats.income.toLocaleString()}</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 opacity-80 mb-1">
+                    <ArrowUpIcon className="w-4 h-4 text-rose-300" />
+                    <p className="text-xs font-bold uppercase tracking-widest">Monthly Expenses</p>
+                  </div>
+                  <p className="text-2xl font-black">₱{stats.expenses.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-48 flex flex-col justify-center items-center">
-            <span className="text-4xl mb-2">📊</span>
-            <p className="text-gray-500 font-medium">Budget Tracking</p>
-            <p className="text-xs text-gray-400 mt-1">(Coming Soon)</p>
+
+          {/* Quick Actions / Reports Summary */}
+          <div className="bg-white rounded-[3.5rem] p-8 border border-pink-50 shadow-sm flex flex-col">
+            <h3 className="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+              <span className="w-2 h-8 bg-pink-500 rounded-full"></span>
+              Pulse Report
+            </h3>
+            <div className="space-y-6 flex-1">
+              <div className="p-5 bg-pink-50/50 rounded-3xl border border-pink-100/50">
+                <div className="flex justify-between items-end mb-3">
+                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Savings Rate</p>
+                  <p className="text-lg font-black text-pink-600">
+                    {stats.income > 0 ? Math.round(((stats.income - stats.expenses) / stats.income) * 100) : 0}%
+                  </p>
+                </div>
+                <div className="h-3 bg-white rounded-full overflow-hidden border border-pink-100">
+                  <div 
+                    className="h-full bg-pink-500 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.3)] transition-all duration-1000"
+                    style={{ width: `${Math.min(100, Math.max(0, stats.income > 0 ? ((stats.income - stats.expenses) / stats.income) * 100 : 0))}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <Link to="/accounts" className="p-6 bg-white border border-pink-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-2 hover:shadow-xl hover:translate-y-[-4px] transition-all group">
+                  <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                    <BanknotesIcon className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-black text-gray-800 uppercase tracking-tighter">Accounts</span>
+                </Link>
+                <Link to="/transactions" className="p-6 bg-white border border-pink-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-2 hover:shadow-xl hover:translate-y-[-4px] transition-all group">
+                  <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                    <ClockIcon className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-black text-gray-800 uppercase tracking-tighter">Activity</span>
+                </Link>
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm h-48 flex flex-col justify-center items-center">
-            <span className="text-4xl mb-2">🎯</span>
-            <p className="text-gray-500 font-medium">Savings Goals</p>
-            <p className="text-xs text-gray-400 mt-1">(Coming Soon)</p>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-[3.5rem] p-10 border border-pink-50 shadow-sm">
+          <div className="flex justify-between items-center mb-10">
+            <h3 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <ClockIcon className="w-7 h-7 text-pink-500" />
+              Recent Activity
+            </h3>
+            <Link to="/transactions" className="text-sm font-black text-pink-500 hover:text-pink-600 flex items-center gap-1 group">
+              View All History
+              <ChevronRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="space-y-6">
+            {loadingTx ? (
+              <div className="py-20 flex flex-col items-center">
+                <div className="w-10 h-10 border-4 border-pink-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-400 font-bold animate-pulse">Scanning the ledger...</p>
+              </div>
+            ) : transactions?.length > 0 ? (
+              transactions.map(tx => (
+                <div key={tx?.id} className="flex items-center gap-5 p-5 bg-white border border-pink-50 rounded-[2.5rem] hover:shadow-xl hover:translate-x-2 transition-all group">
+                  <div 
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform"
+                    style={{ backgroundColor: tx?.category?.color || '#F3F4F6' }}
+                  >
+                    {tx?.type === 'income' ? '💰' : '💸'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-black text-gray-900 truncate tracking-tight">{tx?.description || tx?.category?.name || 'Uncategorized'}</p>
+                    <p className="text-sm font-bold text-gray-400 flex items-center gap-2 uppercase tracking-widest">
+                      {tx?.category?.name || 'No Category'} • {tx?.transaction_date ? new Date(tx.transaction_date).toLocaleDateString() : 'No Date'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-xl font-black tracking-tighter ${tx?.type === 'income' ? 'text-emerald-500' : 'text-gray-900'}`}>
+                      {tx?.type === 'income' ? '+' : '-'}₱{Number(tx?.amount || 0).toLocaleString()}
+                    </p>
+                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-tighter">
+                      {tx?.card?.card_name || tx?.wallet?.wallet_name || 'Cash'}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-20 text-center bg-pink-50/30 rounded-[3rem] border-2 border-dashed border-pink-100">
+                <p className="text-gray-500 font-black uppercase tracking-widest mb-2">No Transactions Yet</p>
+                <p className="text-sm text-gray-400">Head to the transactions page to track your first penny.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
