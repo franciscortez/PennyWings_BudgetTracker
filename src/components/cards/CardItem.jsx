@@ -7,10 +7,11 @@ export default function CardItem({ card, onEdit, onDelete }) {
   return (
     <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-pink-50 hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 group">
       <div 
-        className="relative h-48 rounded-[2rem] p-6 text-white overflow-hidden shadow-lg mb-4"
+        className="relative h-48 rounded-[2rem] p-6 overflow-hidden shadow-lg mb-4"
         style={{ 
           background: `linear-gradient(135deg, ${bgColor}, ${bgColor}CC)`,
-          boxShadow: `0 10px 20px -5px ${bgColor}66`
+          boxShadow: `0 10px 20px -5px ${bgColor}66`,
+          color: card.text_color || '#FFFFFF'
         }}
       >
         {/* Card Pattern/Decoration */}
@@ -28,7 +29,7 @@ export default function CardItem({ card, onEdit, onDelete }) {
               </h3>
             </div>
             <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2">
-              <Icon name="card" color="white" />
+              <Icon name="card" color="currentColor" />
             </div>
           </div>
           
