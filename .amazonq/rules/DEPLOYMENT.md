@@ -1,53 +1,40 @@
-# Deployment Guide - PennyWings
+# Deployment Rules
 
-This document outlines the steps for redeploying the PennyWings codebase to Netlify using the automated workflow and MCP tools.
+## ⚠️ ALWAYS BUILD BEFORE DEPLOYING
 
-## Prerequisites
+Before triggering any Netlify deploy, you **must** run the production build first.
+Deploying raw source files causes a MIME type error in the browser (`application/octet-stream`).
 
-1.  **Build Tool**: Ensure `npm` is installed and you can run `npm run build`.
-2.  **Netlify MCP**: The deployment relies on the Netlify MCP server for pushing the production build live.
+### Steps (in order)
 
-## Redeployment Workflow
+1. **Build the project**
+   ```bash
+   npm run build
+   ```
+   This compiles all `.jsx` / `.js` source files into `dist/`.
 
-Follow these steps to deploy your latest changes:
+2. **Deploy the `dist/` folder to Netlify**
+   - Via Netlify MCP: set `deployDirectory` to the absolute path of `dist/`
+   - Example: `/Users/bamcortez/Documents/Code/BudgetTrackerSuperbase/dist`
 
-### 1. Generate Production Build
-First, you must compile the application into a production-ready package. This will generate a `dist` folder at the root of the project.
-
-```bash
-npm run build
-```
-
-### 2. Verify Build Output
-Ensure that the `dist` folder contains the compiled `index.html` and assets.
-
-### 3. Deploy to Netlify (via MCP)
-Use the Netlify MCP server's `deploy-site` tool with the following parameters:
-
-- **Site ID**: `a86a04a3-6ecf-406a-9370-9e659d96c204`
-- **Deploy Directory**: `dist` (Absolute path recommended: `d:\Coding\BudgetTrackerSuperbase\dist`)
-
-**Command used by AI:**
-```json
-{
-  "operation": "deploy-site",
-  "params": {
-    "deployDirectory": "d:\\Coding\\BudgetTrackerSuperbase\\dist",
-    "siteId": "a86a04a3-6ecf-406a-9370-9e659d96c204"
-  }
-}
-```
-
-### 4. Monitor Deployment
-After execution, the MCP will return a `deployId` and a `monitorDeployUrl`. You can visit the Netlify dashboard to see the progress.
+3. **Commit and push** any config changes (e.g. `netlify.toml`) after deploy.
 
 ---
 
-## Environment Variables
-If you make changes to Supabase credentials or other API keys, ensure they are synced to Netlify:
-1.  Use Netlify MCP `manage-env-vars` or update them manually in the Netlify Dashboard under **Site Settings > Environment Variables**.
-2.  Redeploy the site after updating variables.
+### Netlify Config
 
-## Troubleshooting
-- **Build Fails**: Check for linting or TypeScript errors in the terminal.
-- **Site not updating**: Ensure you are deploying the correct `dist` folder and the `siteId` matches the intended project.
+The `netlify.toml` at the project root is configured with:
+- **Build command**: `npm run build`
+- **Publish directory**: `dist`
+- **SPA redirect**: all routes fall back to `index.html` (required for React Router)
+
+---
+
+### Site Info
+
+| Property | Value |
+|---|---|
+| Site name | `penny-wings` |
+| Site ID | `a86a04a3-6ecf-406a-9370-9e659d96c204` |
+| Production URL | https://penny-wings.netlify.app |
+| Netlify Dashboard | https://app.netlify.com/projects/penny-wings |
