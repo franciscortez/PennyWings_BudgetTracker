@@ -66,6 +66,7 @@ Update this progress as you move through the work.
 - 🚀 **Always leverage Available MCP Servers** for infrastructure and deployment tasks:
     - **Supabase MCP**: Use for database migrations (`apply_migration`), executing SQL (`execute_sql`), managing Edge Functions (`deploy_edge_function`), and checking logs.
     - **Netlify MCP**: Use for managing site deployments (`deploy-site`), configuring environment variables (`manage-env-vars`), and checking deployment status.
+- ⚛️ **Use TanStack Query (React Query)** for all server state management (fetching, caching, synchronization, and mutations). Avoid complex `useEffect` chains for data fetching.
 
 ---
 

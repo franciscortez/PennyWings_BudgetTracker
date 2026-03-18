@@ -115,6 +115,7 @@ Real-time sync across devices
 ### Core Technologies
 
 -   **React 19.2.4** - UI library with hooks and modern features
+-   **TanStack Query (React Query) v5** - Powerful asynchronous state management for data fetching, caching, and synchronization
 -   **Vite 8.0.0** - Fast build tool and dev server with HMR
 -   **Supabase** - Backend-as-a-Service (BaaS) for:
     -   PostgreSQL database
@@ -147,10 +148,10 @@ BudgetTrackerSuperbase/
 │   └── icons.svg           # SVG sprite for icons
 ├── src/
 │   ├── assets/             # Images and static files
-│   ├── App.jsx             # Main app component (currently boilerplate)
-│   ├── App.css             # App-specific styles
-│   ├── index.css           # Global styles and CSS variables
-│   └── main.jsx            # React entry point
+│   ├── lib/
+│   │   ├── supabase.js      # Supabase client configuration
+│   │   └── queryClient.js   # TanStack Query client configuration
+│   ├── App.jsx             # Main app component with QueryClientProvider
 ├── .gitignore
 ├── eslint.config.js        # ESLint configuration
 ├── index.html              # HTML entry point
@@ -175,6 +176,7 @@ BudgetTrackerSuperbase/
 -   ✅ Authentication system (Login, Signup, Forgot Password, Reset Password)
 -   ✅ Modernized Icon System (Lucide React)
 -   ✅ Premium Notification System (SweetAlert2)
+-   ✅ React Query Integration (Infrastructure for optimized data fetching and caching)
 
 ### Missing/To Be Implemented
 
@@ -321,7 +323,8 @@ npx tailwindcss init -p
 ### State Management
 
 -   React hooks (useState, useEffect, useContext) for local state
--   Context API for global state (auth, theme)
+-   **TanStack Query (React Query)** for server state (caching, loading states, synchronization, and mutations)
+-   Context API for global UI state (auth, theme)
 -   Supabase real-time for data synchronization
 
 ### Styling Approach

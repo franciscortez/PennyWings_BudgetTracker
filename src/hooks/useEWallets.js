@@ -1,117 +1,100 @@
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
-import { useAuth } from '../hooks/useAuth'
+import { useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../hooks/useAuth";
 
 export const useEWallets = () => {
-  const { user } = useAuth()
-  const [wallets, setWallets] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const fetchWallets = useCallback(async (background = false) => {
-    try {
-      if (!background) setLoading(true)
+  const walletsQuery = useQuery({
+    queryKey: ["e_wallets", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
-        .from('e_wallets')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false })
+        .from("e_wallets")
+        .select("*")
+        .eq("user_id", user?.id)
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
-      setWallets(data || [])
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      if (!background) setLoading(false)
-    }
-  }, [user?.id])
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
 
-  const addWallet = async (walletData) => {
-    const tempId = 'temp-' + Date.now()
-    const optimisticWallet = {
-      ...walletData,
-      id: tempId,
-      user_id: user?.id,
-      created_at: new Date().toISOString()
-    }
-    setWallets(prev => [optimisticWallet, ...prev])
+  const invalidateAccounts = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["e_wallets", user?.id] });
+    queryClient.invalidateQueries({ queryKey: ["recent_transactions", user?.id] });
+  }, [queryClient, user?.id]);
 
-    try {
+  const addMutation = useMutation({
+    mutationFn: async (walletData) => {
       const { data, error } = await supabase
-        .from('e_wallets')
+        .from("e_wallets")
         .insert([{ ...walletData, user_id: user?.id }])
         .select()
+        .single();
 
-      if (error) throw error
-      if (data) setWallets(prev => prev.map(w => w.id === tempId ? data[0] : w))
-      return { data, error: null }
-    } catch (err) {
-      setWallets(prev => prev.filter(w => w.id !== tempId)) // revert optimistic
-      return { data: null, error: err.message }
-    }
-  }
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      invalidateAccounts();
+    },
+  });
 
-  const updateWallet = async (id, updates) => {
-    try {
-      setWallets(prev => prev.map(w => w.id === id ? { ...w, ...updates } : w))
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, updates }) => {
       const { data, error } = await supabase
-        .from('e_wallets')
+        .from("e_wallets")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
+        .single();
 
-      if (error) throw error
-      return { data, error: null }
-    } catch (err) {
-      fetchWallets(true) // Revert on error
-      return { data: null, error: err.message }
-    }
-  }
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      invalidateAccounts();
+    },
+  });
 
-  const deleteWallet = async (id) => {
-    try {
-      setWallets(prev => prev.filter(w => w.id !== id))
-      const { error } = await supabase
-        .from('e_wallets')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-      return { error: null }
-    } catch (err) {
-      fetchWallets(true) // Revert on error
-      return { error: err.message }
-    }
-  }
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from("e_wallets").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      invalidateAccounts();
+    },
+  });
 
   useEffect(() => {
     if (user) {
-      fetchWallets()
-
-      // Real-time subscription
       const subscription = supabase
-        .channel('e_wallets_changes')
-        .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'e_wallets', filter: `user_id=eq.${user.id}` }, 
+        .channel("e_wallets_changes")
+        .on("postgres_changes",
+          { event: "*", schema: "public", table: "e_wallets", filter: `user_id=eq.${user.id}` },
           () => {
-            fetchWallets(true)
+            queryClient.invalidateQueries({ queryKey: ["e_wallets", user.id] });
           }
         )
-        .subscribe()
+        .subscribe();
 
       return () => {
-        supabase.removeChannel(subscription)
-      }
+        supabase.removeChannel(subscription);
+      };
     }
-  }, [user, fetchWallets])
+  }, [user, queryClient]);
 
   return {
-    wallets,
-    loading,
-    error,
-    addWallet,
-    updateWallet,
-    deleteWallet,
-    refreshWallets: fetchWallets
-  }
-}
+    wallets: walletsQuery.data || [],
+    loading: walletsQuery.isLoading || addMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+    error: walletsQuery.error || addMutation.error || updateMutation.error || deleteMutation.error,
+    addWallet: addMutation.mutateAsync,
+    updateWallet: (id, updates) => updateMutation.mutateAsync({ id, updates }),
+    deleteWallet: deleteMutation.mutateAsync,
+    refreshWallets: () => queryClient.invalidateQueries({ queryKey: ["e_wallets", user?.id] }),
+  };
+};

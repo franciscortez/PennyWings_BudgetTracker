@@ -1,117 +1,100 @@
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
-import { useAuth } from '../hooks/useAuth'
+import { useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../hooks/useAuth";
 
 export const useBankCards = () => {
-  const { user } = useAuth()
-  const [cards, setCards] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const fetchCards = useCallback(async (background = false) => {
-    try {
-      if (!background) setLoading(true)
+  const cardsQuery = useQuery({
+    queryKey: ["bank_cards", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
-        .from('bank_cards')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false })
+        .from("bank_cards")
+        .select("*")
+        .eq("user_id", user?.id)
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
-      setCards(data || [])
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      if (!background) setLoading(false)
-    }
-  }, [user?.id])
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
 
-  const addCard = async (cardData) => {
-    const tempId = 'temp-' + Date.now()
-    const optimisticCard = {
-      ...cardData,
-      id: tempId,
-      user_id: user?.id,
-      created_at: new Date().toISOString()
-    }
-    setCards(prev => [optimisticCard, ...prev])
+  const invalidateAccounts = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["bank_cards", user?.id] });
+    queryClient.invalidateQueries({ queryKey: ["recent_transactions", user?.id] });
+  }, [queryClient, user?.id]);
 
-    try {
+  const addMutation = useMutation({
+    mutationFn: async (cardData) => {
       const { data, error } = await supabase
-        .from('bank_cards')
+        .from("bank_cards")
         .insert([{ ...cardData, user_id: user?.id }])
         .select()
+        .single();
 
-      if (error) throw error
-      if (data) setCards(prev => prev.map(c => c.id === tempId ? data[0] : c))
-      return { data, error: null }
-    } catch (err) {
-      setCards(prev => prev.filter(c => c.id !== tempId)) // revert optimistic
-      return { data: null, error: err.message }
-    }
-  }
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      invalidateAccounts();
+    },
+  });
 
-  const updateCard = async (id, updates) => {
-    try {
-      setCards(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c))
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, updates }) => {
       const { data, error } = await supabase
-        .from('bank_cards')
+        .from("bank_cards")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
+        .single();
 
-      if (error) throw error
-      return { data, error: null }
-    } catch (err) {
-      fetchCards(true) // Revert on error
-      return { data: null, error: err.message }
-    }
-  }
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      invalidateAccounts();
+    },
+  });
 
-  const deleteCard = async (id) => {
-    try {
-      setCards(prev => prev.filter(c => c.id !== id))
-      const { error } = await supabase
-        .from('bank_cards')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-      return { error: null }
-    } catch (err) {
-      fetchCards(true) // Revert on error
-      return { error: err.message }
-    }
-  }
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from("bank_cards").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      invalidateAccounts();
+    },
+  });
 
   useEffect(() => {
     if (user) {
-      fetchCards()
-
-      // Real-time subscription
       const subscription = supabase
-        .channel('bank_cards_changes')
-        .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'bank_cards', filter: `user_id=eq.${user.id}` }, 
+        .channel("bank_cards_changes")
+        .on("postgres_changes",
+          { event: "*", schema: "public", table: "bank_cards", filter: `user_id=eq.${user.id}` },
           () => {
-            fetchCards(true)
+            queryClient.invalidateQueries({ queryKey: ["bank_cards", user.id] });
           }
         )
-        .subscribe()
+        .subscribe();
 
       return () => {
-        supabase.removeChannel(subscription)
-      }
+        supabase.removeChannel(subscription);
+      };
     }
-  }, [user, fetchCards])
+  }, [user, queryClient]);
 
   return {
-    cards,
-    loading,
-    error,
-    addCard,
-    updateCard,
-    deleteCard,
-    refreshCards: fetchCards
-  }
-}
+    cards: cardsQuery.data || [],
+    loading: cardsQuery.isLoading || addMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+    error: cardsQuery.error || addMutation.error || updateMutation.error || deleteMutation.error,
+    addCard: addMutation.mutateAsync,
+    updateCard: (id, updates) => updateMutation.mutateAsync({ id, updates }),
+    deleteCard: deleteMutation.mutateAsync,
+    refreshCards: () => queryClient.invalidateQueries({ queryKey: ["bank_cards", user?.id] }),
+  };
+};

@@ -8,7 +8,7 @@ This document tracks the development progress of the Budget Tracker application 
 
 ## 🎯 Current Task
 
-**No active tasks - Waiting for assignment**
+**Documentation Maintenance & Context Synchronization**
 
 ---
 
@@ -98,11 +98,11 @@ This document tracks the development progress of the Budget Tracker application 
   - Export transactions to CSV
   - Export budget reports to PDF
   - Date range selection for exports
-- ⏸️ **Real-time Sync** - Not started
-  - Supabase real-time subscriptions
-  - Live balance updates
-  - Transaction sync across devices
-  - Budget updates in real-time
+- ✅ **Real-time Sync** - Completed
+  - ✅ Supabase real-time subscriptions for transactions, cards, and wallets
+  - ✅ Live balance updates using reactive invalidation
+  - ✅ Automatic synchronization across components via TanStack Query
+  - ✅ Real-time data consistency between DB and UI
 
 ---
 
@@ -125,6 +125,30 @@ This document tracks the development progress of the Budget Tracker application 
 
 **Notes:**
 [Any important observations or decisions]
+
+---
+ 
+### Infrastructure: React Query Integration - 2026-03-18
+**Status:** ✅ Completed
+
+**Description:**
+Integrated TanStack Query (React Query) v5 to manage asynchronous server state. Refactored all data-fetching hooks to use `useQuery` and `useMutation`, significantly improving caching, background synchronization, and UI responsiveness.
+
+**Files Modified/Created:**
+- `src/lib/queryClient.js` [NEW]
+- `src/App.jsx` (Added QueryClientProvider)
+- `src/hooks/useBankCards.js` (Refactored to use useQuery)
+- `src/hooks/useEWallets.js` (Refactored to use useQuery)
+- `src/hooks/useTransactions.js` (Refactored with useQuery, useMutation, and real-time invalidation)
+- `src/hooks/useDashboardData.js` (Refactored to use useQuery)
+- `src/hooks/useCategories.js` (Refactored to use useQuery)
+- `package.json` (Added @tanstack/react-query)
+
+**Outcome:**
+- Eliminates manual loading/error state management in components.
+- Provides automatic background data refresh and smart caching.
+- Synchronizes local balance state with the database atomically using RPC and reactive invalidation.
+- Dramatically smoother user experience when adding or deleting transactions.
 
 ---
 ```

@@ -12,7 +12,7 @@ const navigation = [
 ];
 
 export default function Layout({ children }) {
-  const { user, profile, signOut } = useAuth();
+  const { profile, signOut } = useAuth();
   const location = useLocation();
 
   const handleLogout = () => {
