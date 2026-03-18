@@ -4,32 +4,16 @@ import { useDashboardData } from "../hooks/useDashboardData";
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon";
 
+import SkeletonLoader from "../components/common/SkeletonLoader";
+
 export default function Dashboard() {
-  const { cards, wallets, transactions, loading } = useDashboardData(5);
+  const { cards, wallets, transactions, monthlyStats: stats, loading } = useDashboardData(5);
 
   const totalBalance = useMemo(() => {
     const cardTotal = cards.reduce((sum, card) => sum + Number(card.balance || 0), 0);
     const walletTotal = wallets.reduce((sum, wallet) => sum + Number(wallet.balance || 0), 0);
     return cardTotal + walletTotal;
   }, [cards, wallets]);
-
-  const stats = useMemo(() => {
-    const now = new Date();
-    const thisMonth = now.getMonth();
-    const thisYear = now.getFullYear();
-
-    return (transactions || []).reduce((acc, tx) => {
-      if (!tx || !tx.transaction_date) return acc;
-      
-      const txDate = new Date(tx.transaction_date);
-      if (txDate.getMonth() === thisMonth && txDate.getFullYear() === thisYear) {
-        const amount = Number(tx.amount || 0);
-        if (tx.type === 'income') acc.income += amount;
-        else if (tx.type === 'expense') acc.expenses += amount;
-      }
-      return acc;
-    }, { income: 0, expenses: 0 });
-  }, [transactions]);
 
   return (
     <Layout>
@@ -135,9 +119,20 @@ export default function Dashboard() {
 
           <div className="space-y-6">
             {loading ? (
-              <div className="py-20 flex flex-col items-center">
-                <div className="w-10 h-10 border-4 border-pink-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
-                <p className="text-gray-400 font-bold animate-pulse">Scanning the ledger...</p>
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-center gap-3 sm:gap-5 p-4 sm:p-5 bg-white border border-pink-50 rounded-[2rem] sm:rounded-[2.5rem]">
+                    <SkeletonLoader className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl" />
+                    <div className="flex-1 space-y-3">
+                      <SkeletonLoader className="h-4 sm:h-5 w-2/3" />
+                      <SkeletonLoader className="h-3 w-1/3" />
+                    </div>
+                    <div className="text-right space-y-2">
+                       <SkeletonLoader className="h-5 sm:h-6 w-16 sm:w-20 ml-auto" />
+                       <SkeletonLoader className="h-2 w-10 sm:w-12 ml-auto" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : transactions?.length > 0 ? (
               transactions.map(tx => (

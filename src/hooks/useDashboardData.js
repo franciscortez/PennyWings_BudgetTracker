@@ -8,6 +8,7 @@ export const useDashboardData = (txLimit = 5) => {
     cards: [],
     wallets: [],
     transactions: [],
+    monthlyStats: { income: 0, expenses: 0 },
     loading: true,
     error: null
   })
@@ -18,7 +19,14 @@ export const useDashboardData = (txLimit = 5) => {
     try {
       if (!background) setData(prev => ({ ...prev, loading: true }))
       
-      const [cardsRes, walletsRes, txRes] = await Promise.all([
+      const now = new Date()
+      // format to YYYY-MM-DD to match database format perfectly
+      const padZero = (num) => num.toString().padStart(2, '0');
+      const firstDay = `${now.getFullYear()}-${padZero(now.getMonth() + 1)}-01`;
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const lastDayStr = `${lastDay.getFullYear()}-${padZero(lastDay.getMonth() + 1)}-${padZero(lastDay.getDate())}`;
+
+      const [cardsRes, walletsRes, txRes, statsRes] = await Promise.all([
         supabase
           .from('bank_cards')
           .select('*')
@@ -40,17 +48,32 @@ export const useDashboardData = (txLimit = 5) => {
           .eq('user_id', user.id)
           .order('transaction_date', { ascending: false })
           .order('created_at', { ascending: false })
-          .limit(txLimit)
+          .limit(txLimit),
+        supabase
+          .from('transactions')
+          .select('type, amount')
+          .eq('user_id', user.id)
+          .gte('transaction_date', firstDay)
+          .lte('transaction_date', lastDayStr)
       ])
 
       if (cardsRes.error) throw cardsRes.error
       if (walletsRes.error) throw walletsRes.error
       if (txRes.error) throw txRes.error
+      if (statsRes.error) throw statsRes.error
+
+      const currentMonthlyStats = (statsRes.data || []).reduce((acc, tx) => {
+        const amount = Number(tx.amount || 0);
+        if (tx.type === 'income') acc.income += amount;
+        else if (tx.type === 'expense') acc.expenses += amount;
+        return acc;
+      }, { income: 0, expenses: 0 });
 
       setData({
         cards: cardsRes.data || [],
         wallets: walletsRes.data || [],
         transactions: txRes.data || [],
+        monthlyStats: currentMonthlyStats,
         loading: false,
         error: null
       })

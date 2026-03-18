@@ -19,3 +19,44 @@ body {
 #root {
   min-height: 100svh;
 }
+
+@layer components {
+  /* Premium UI Effects */
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm transition-all duration-300;
+  }
+
+  .premium-card {
+    @apply glass-panel rounded-[2.5rem] md:rounded-[3.5rem];
+  }
+  
+  .premium-card-hover {
+    @apply hover:shadow-xl hover:translate-y-[-4px] hover:border-pink-100;
+  }
+  
+  .premium-btn {
+    @apply flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black transition-all duration-300 active:scale-95;
+  }
+  
+  .premium-btn-primary {
+    @apply premium-btn bg-pink-500 text-white shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .premium-btn-secondary {
+    @apply premium-btn bg-pink-50 text-pink-600 hover:bg-pink-100;
+  }
+}
+
+/* Premium Skeleton Animation */
+@keyframes pulse-premium {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse-premium {
+  animation: pulse-premium 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
