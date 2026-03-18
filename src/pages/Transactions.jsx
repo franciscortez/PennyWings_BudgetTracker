@@ -1,9 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Layout from "../components/Layout";
 import { useTransactions } from "../hooks/useTransactions";
 import TransactionForm from "../components/transactions/TransactionForm";
 import Icon from "../components/Icon";
 import Swal from 'sweetalert2'
+import { motion as Motion, AnimatePresence } from 'motion/react'
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+};
+
+const staggerContainer = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.05,
+    }
+  }
+};
 
 export default function Transactions() {
   const { transactions, loading, addTransaction, deleteTransaction } = useTransactions(100);
@@ -76,31 +92,48 @@ export default function Transactions() {
     currentPage * itemsPerPage
   );
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, filterType]);
+  // Use event handlers for state updates to avoid useEffect setState overhead/warnings
+  const onSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    if (currentPage !== 1) setCurrentPage(1);
+  };
+
+  const onFilterChange = (type) => {
+    setFilterType(type);
+    if (currentPage !== 1) setCurrentPage(1);
+  };
 
   return (
     <Layout>
       <div className="space-y-8 pb-20">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <Motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+        >
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Transaction History</h1>
             <p className="text-gray-500 font-medium font-bold">Manage your cashflow with precision.</p>
           </div>
-          <button 
+          <Motion.button 
+            whileHover={{ scale: 1.05, y: -4 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setIsFormOpen(true)}
-            className="flex items-center justify-center gap-2 px-8 py-4 bg-pink-500 text-white rounded-[2rem] font-black shadow-xl shadow-pink-200 hover:bg-pink-600 hover:translate-y-[-4px] transition-all"
+            className="flex items-center justify-center gap-2 px-8 py-4 bg-pink-500 text-white rounded-[2rem] font-black shadow-xl shadow-pink-200 hover:bg-pink-600 transition-all font-bold"
           >
             <Icon name="plus" color="white" className="w-5 h-5" />
             New Transaction
-          </button>
-        </div>
+          </Motion.button>
+        </Motion.div>
 
         {/* Filters & Search */}
-        <div className="flex flex-col lg:flex-row gap-4 items-center bg-white p-6 rounded-[2.5rem] border border-pink-50 shadow-sm">
+        <Motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col lg:flex-row gap-4 items-center bg-white p-6 rounded-[2.5rem] border border-pink-50 shadow-sm"
+        >
           <div className="relative flex-1 w-full text-left">
             <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-4">Search Ledger</label>
             <div className="relative">
@@ -109,7 +142,7 @@ export default function Transactions() {
                 type="text" 
                 placeholder="Description, category..." 
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={onSearchChange}
                 className="w-full pl-12 pr-6 py-4 bg-pink-50/30 border border-pink-100 rounded-[1.5rem] focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 outline-none transition-all font-bold text-gray-700"
               />
             </div>
@@ -120,7 +153,7 @@ export default function Transactions() {
               {['all', 'income', 'expense', 'withdrawal'].map(type => (
                 <button
                   key={type}
-                  onClick={() => setFilterType(type)}
+                  onClick={() => onFilterChange(type)}
                   className={`px-6 py-4 rounded-[1.2rem] font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${
                     filterType === type 
                       ? 'bg-gray-900 text-white shadow-lg' 
@@ -132,10 +165,15 @@ export default function Transactions() {
               ))}
             </div>
           </div>
-        </div>
+        </Motion.div>
 
         {/* Transactions Table */}
-        <div className="bg-white rounded-[3rem] border border-pink-50 shadow-xl shadow-pink-100/20 overflow-hidden">
+        <Motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-[3rem] border border-pink-50 shadow-xl shadow-pink-100/20 overflow-hidden"
+        >
           {loading ? (
             <div className="py-20 flex flex-col items-center">
               <div className="w-12 h-12 border-4 border-pink-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
@@ -153,61 +191,72 @@ export default function Transactions() {
                     <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-pink-50">
-                  {paginatedTransactions.map(tx => (
-                    <tr key={tx.id} className="group hover:bg-pink-50/30 transition-colors">
-                      <td className="px-8 py-6">
-                        <div>
-                          <p className="font-black text-gray-900 tracking-tight leading-none mb-1">{tx.description || tx.category?.name}</p>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
-                            <Icon name="clock" className="w-3 h-3" />
-                            {new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-50 text-pink-500 text-xs font-black uppercase tracking-widest border border-pink-100">
-                          {tx.category?.name || 'Uncategorized'}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-2 text-gray-500">
-                          <Icon name="bank" className="w-4 h-4 opacity-50" />
-                          <span className="text-xs font-bold uppercase tracking-wider">
-                            {tx.card?.card_name || tx.wallet?.wallet_name || 'Cash'}
+                <Motion.tbody 
+                  variants={staggerContainer}
+                  initial="initial"
+                  animate="animate"
+                  className="divide-y divide-pink-50"
+                >
+                  <AnimatePresence mode="popLayout">
+                    {paginatedTransactions.map(tx => (
+                      <Motion.tr 
+                        key={tx.id} 
+                        variants={fadeInUp}
+                        layout
+                        className="group hover:bg-pink-50/30 transition-colors"
+                      >
+                        <td className="px-8 py-6">
+                          <div>
+                            <p className="font-black text-gray-900 tracking-tight leading-none mb-1">{tx.description || tx.category?.name}</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                              <Icon name="clock" className="w-3 h-3" />
+                              {new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-50 text-pink-500 text-xs font-black uppercase tracking-widest border border-pink-100">
+                            {tx.category?.name || 'Uncategorized'}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <p className={`text-xl font-black tracking-tighter ${
-                          tx.type === 'income' ? 'text-emerald-500' : 
-                          tx.type === 'withdrawal' ? 'text-amber-500' : 
-                          'text-rose-500'
-                        }`}>
-                          {tx.type === 'income' ? '+' : '-'}₱{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
-                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
-                          tx.type === 'income' ? 'bg-emerald-50 text-emerald-500' :
-                          tx.type === 'withdrawal' ? 'bg-amber-50 text-amber-500' :
-                          'bg-rose-50 text-rose-500'
-                        }`}>
-                          {tx.type}
-                        </span>
-                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mt-0.5">
-                          {tx.payment_method}
-                        </p>
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <button 
-                          onClick={() => handleDeleteTransaction(tx)}
-                          className="p-3 text-gray-200 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
-                        >
-                          <Icon name="delete" color="currentColor" className="w-5 h-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <Icon name="bank" className="w-4 h-4 opacity-50" />
+                            <span className="text-xs font-bold uppercase tracking-wider">
+                              {tx.card?.card_name || tx.wallet?.wallet_name || 'Cash'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <p className={`text-xl font-black tracking-tighter ${
+                            tx.type === 'income' ? 'text-emerald-500' : 
+                            tx.type === 'withdrawal' ? 'text-amber-500' : 
+                            'text-rose-500'
+                          }`}>
+                            {tx.type === 'income' ? '+' : '-'}₱{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </p>
+                          <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                            tx.type === 'income' ? 'bg-emerald-50 text-emerald-500' :
+                            tx.type === 'withdrawal' ? 'bg-amber-50 text-amber-500' :
+                            'bg-rose-50 text-rose-500'
+                          }`}>
+                            {tx.type}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 text-center">
+                          <Motion.button 
+                            whileHover={{ scale: 1.1, backgroundColor: '#FFF1F2' }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleDeleteTransaction(tx)}
+                            className="p-3 text-gray-200 hover:text-rose-500 rounded-xl transition-colors"
+                          >
+                            <Icon name="delete" color="currentColor" className="w-5 h-5" />
+                          </Motion.button>
+                        </td>
+                      </Motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </Motion.tbody>
               </table>
             </div>
           ) : (
@@ -226,17 +275,21 @@ export default function Transactions() {
                 Showing <span className="text-pink-500">{(currentPage-1)*itemsPerPage + 1}</span> to <span className="text-pink-500">{Math.min(currentPage*itemsPerPage, filteredTransactions.length)}</span> of {filteredTransactions.length}
               </p>
               <div className="flex gap-2">
-                <button
+                <Motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                   className="p-3 rounded-xl bg-white border border-pink-100 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition-all disabled:opacity-30"
                 >
                   <Icon name="arrowLeft" className="w-4 h-4" />
-                </button>
+                </Motion.button>
                 <div className="flex gap-1">
                   {[...Array(totalPages)].map((_, i) => (
-                    <button
+                    <Motion.button
                       key={i}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => setCurrentPage(i + 1)}
                       className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
                         currentPage === i + 1
@@ -245,20 +298,22 @@ export default function Transactions() {
                       }`}
                     >
                       {i + 1}
-                    </button>
+                    </Motion.button>
                   ))}
                 </div>
-                <button
+                <Motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
                   className="p-3 rounded-xl bg-white border border-pink-100 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition-all rotate-180 disabled:opacity-30"
                 >
                   <Icon name="arrowLeft" className="w-4 h-4" />
-                </button>
+                </Motion.button>
               </div>
             </div>
           )}
-        </div>
+        </Motion.div>
       </div>
 
       <TransactionForm 

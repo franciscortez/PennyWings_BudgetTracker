@@ -1,8 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Layout from "../components/Layout";
 import Icon from "../components/Icon";
 import Swal from "sweetalert2";
+import { motion as Motion } from "motion/react";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
 
 export default function Profile() {
   const { user, profile, updateProfile, updatePassword } = useAuth();
@@ -13,11 +29,12 @@ export default function Profile() {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
-  useEffect(() => {
-    if (profile?.full_name) {
-      setFullName(profile.full_name);
-    }
-  }, [profile]);
+  // Pattern for adjusting state based on props/hooks during render (to avoid setState in effect)
+  const [initializedId, setInitializedId] = useState(null);
+  if (profile?.id && profile.id !== initializedId) {
+    setFullName(profile.full_name || "");
+    setInitializedId(profile.id);
+  }
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -113,35 +130,63 @@ export default function Profile() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-10 pb-20">
+      <Motion.div 
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="max-w-4xl mx-auto space-y-10 pb-20"
+      >
         {/* Header Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-pink-500 to-pink-600 rounded-[3rem] p-10 text-white shadow-2xl shadow-pink-200">
+        <Motion.div 
+          variants={item}
+          className="relative overflow-hidden bg-gradient-to-br from-pink-500 to-pink-600 rounded-[3rem] p-10 text-white shadow-2xl shadow-pink-200"
+        >
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-10 translate-y-[-20px] blur-3xl"></div>
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-            <div className="w-32 h-32 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/30 flex items-center justify-center p-2 shadow-xl">
+            <Motion.div 
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="w-32 h-32 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/30 flex items-center justify-center p-2 shadow-xl"
+            >
               <div className="w-full h-full bg-pink-100 rounded-full flex items-center justify-center text-pink-500">
                 <Icon name="user" className="w-16 h-16" />
               </div>
-            </div>
+            </Motion.div>
             <div className="text-center md:text-left">
-              <h1 className="text-4xl font-black tracking-tight mb-2">
+              <Motion.h1 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-4xl font-black tracking-tight mb-2"
+              >
                 {profile?.full_name || user?.email?.split('@')[0]}
-              </h1>
-              <p className="text-pink-100 font-bold flex items-center justify-center md:justify-start gap-2 italic">
+              </Motion.h1>
+              <Motion.p 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-pink-100 font-bold flex items-center justify-center md:justify-start gap-2 italic"
+              >
                 <Icon name="clock" className="w-4 h-4" />
                 Member since {new Date(user?.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-              </p>
+              </Motion.p>
             </div>
           </div>
-        </div>
+        </Motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Profile Details Form */}
-          <div className="bg-white rounded-[3.5rem] p-8 md:p-10 border border-pink-50 shadow-sm">
+          <Motion.div 
+            variants={item}
+            whileHover={{ y: -5 }}
+            className="bg-white rounded-[3.5rem] p-8 md:p-10 border border-pink-50 shadow-sm"
+          >
             <h2 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-              <span className="p-2 bg-pink-50 rounded-xl text-pink-500">
+              <Motion.span 
+                whileHover={{ rotate: 10 }}
+                className="p-2 bg-pink-50 rounded-xl text-pink-500"
+              >
                 <Icon name="user" className="w-6 h-6" />
-              </span>
+              </Motion.span>
               Account Details
             </h2>
             
@@ -155,19 +200,22 @@ export default function Profile() {
 
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
-                <input
+                <Motion.input
+                  whileFocus={{ scale: 1.01, boxShadow: "0 10px 15px -3px rgba(236, 72, 153, 0.1)" }}
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full px-6 py-4 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-50 focus:border-pink-300 transition-all font-bold text-gray-700 placeholder:text-gray-300"
+                  className="w-full px-6 py-4 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-50 focus:border-pink-300 transition-all font-bold text-gray-700 placeholder:text-gray-300 outline-none"
                 />
               </div>
 
-              <button
+              <Motion.button
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isUpdatingProfile}
-                className="w-full py-4 bg-pink-500 text-white rounded-2xl font-black tracking-tight shadow-lg shadow-pink-200 hover:bg-pink-600 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-pink-500 text-white rounded-2xl font-black tracking-tight shadow-lg shadow-pink-200 hover:bg-pink-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isUpdatingProfile ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -175,46 +223,57 @@ export default function Profile() {
                   <Icon name="plus" className="w-5 h-5 rotate-45" />
                 )}
                 Save Changes
-              </button>
+              </Motion.button>
             </form>
-          </div>
+          </Motion.div>
 
           {/* Security Form */}
-          <div className="bg-white rounded-[3.5rem] p-8 md:p-10 border border-pink-50 shadow-sm">
+          <Motion.div 
+            variants={item}
+            whileHover={{ y: -5 }}
+            className="bg-white rounded-[3.5rem] p-8 md:p-10 border border-pink-50 shadow-sm"
+          >
             <h2 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-              <span className="p-2 bg-pink-50 rounded-xl text-pink-500">
+              <Motion.span 
+                whileHover={{ rotate: 10 }}
+                className="p-2 bg-pink-50 rounded-xl text-pink-500"
+              >
                 <Icon name="lock" className="w-6 h-6" />
-              </span>
+              </Motion.span>
               Security
             </h2>
 
             <form onSubmit={handleUpdatePassword} className="space-y-6 text-left">
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">New Password</label>
-                <input
+                <Motion.input
+                  whileFocus={{ scale: 1.01, boxShadow: "0 10px 15px -3px rgba(236, 72, 153, 0.1)" }}
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-6 py-4 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-50 focus:border-pink-300 transition-all font-bold text-gray-700 placeholder:text-gray-300"
+                  className="w-full px-6 py-4 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-50 focus:border-pink-300 transition-all font-bold text-gray-700 placeholder:text-gray-300 outline-none"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Confirm Password</label>
-                <input
+                <Motion.input
+                  whileFocus={{ scale: 1.01, boxShadow: "0 10px 15px -3px rgba(236, 72, 153, 0.1)" }}
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-6 py-4 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-50 focus:border-pink-300 transition-all font-bold text-gray-700 placeholder:text-gray-300"
+                  className="w-full px-6 py-4 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-50 focus:border-pink-300 transition-all font-bold text-gray-700 placeholder:text-gray-300 outline-none"
                 />
               </div>
 
-              <button
+              <Motion.button
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isUpdatingPassword}
-                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black tracking-tight shadow-xl hover:bg-black hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black tracking-tight shadow-xl hover:bg-black transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isUpdatingPassword ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -222,11 +281,11 @@ export default function Profile() {
                   <Icon name="lock" className="w-5 h-5" />
                 )}
                 Update Password
-              </button>
+              </Motion.button>
             </form>
-          </div>
+          </Motion.div>
         </div>
-      </div>
+      </Motion.div>
     </Layout>
   );
 }

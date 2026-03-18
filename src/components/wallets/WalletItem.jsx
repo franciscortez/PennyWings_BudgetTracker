@@ -1,13 +1,22 @@
 import React from 'react'
 import Icon from '../Icon'
+import { motion as Motion } from 'motion/react'
 
 export default function WalletItem({ wallet, onEdit, onDelete }) {
   const bgColor = wallet.color || '#FFB6C1'
   
   return (
-    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-pink-50 hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 group">
-      <div 
-        className="relative h-48 rounded-[2rem] p-6 overflow-hidden shadow-lg mb-4"
+    <Motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      whileHover={{ y: -5 }}
+      className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-pink-50 relative overflow-hidden group transition-all duration-300"
+    >
+      <Motion.div 
+        whileHover={{ scale: 1.02 }}
+        className="relative h-48 rounded-[2rem] p-6 overflow-hidden shadow-lg mb-4 cursor-pointer"
         style={{ 
           background: `linear-gradient(135deg, ${bgColor}, ${bgColor}DD)`,
           boxShadow: `0 10px 20px -5px ${bgColor}66`,
@@ -27,9 +36,12 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
                 {wallet.wallet_name}
               </h3>
             </div>
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2">
+            <Motion.div 
+              whileHover={{ rotate: -15 }}
+              className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2"
+            >
               <Icon name={wallet.wallet_type === 'cash' ? 'cash' : 'wallet'} color="currentColor" />
-            </div>
+            </Motion.div>
           </div>
           
           <div className="mt-auto">
@@ -46,28 +58,38 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
             </div>
           </div>
         </div>
-      </div>
+      </Motion.div>
       
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
-          <button 
+          <Motion.button 
+            whileHover={{ scale: 1.1, backgroundColor: '#FDF2F8' }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => onEdit(wallet)}
-            className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-all"
+            className="p-2 text-gray-400 hover:text-pink-500 rounded-xl transition-colors"
             title="Edit Wallet"
           >
             <Icon name="edit" color="currentColor" className="w-5 h-5" />
-          </button>
-          <button 
+          </Motion.button>
+          <Motion.button 
+            whileHover={{ scale: 1.1, backgroundColor: '#FFF1F2' }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => onDelete(wallet.id)}
-            className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+            className="p-2 text-gray-400 hover:text-rose-500 rounded-xl transition-colors"
             title="Delete Wallet"
           >
             <Icon name="delete" color="currentColor" className="w-5 h-5" />
-          </button>
+          </Motion.button>
         </div>
         
-        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: wallet.is_active !== false ? '#10B981' : '#EF4444' }}></div>
+        <Motion.div 
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="h-2 w-2 rounded-full" 
+          style={{ backgroundColor: wallet.is_active !== false ? '#10B981' : '#EF4444' }}
+        ></Motion.div>
       </div>
-    </div>
+    </Motion.div>
   )
 }

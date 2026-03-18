@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { format, startOfMonth, endOfMonth, startOfYear, startOfWeek, subDays, subMonths } from 'date-fns';
@@ -9,6 +9,22 @@ import SpendingChart from '../components/reports/SpendingChart';
 import AllocationChart from '../components/reports/AllocationChart';
 import Icon from '../components/Icon';
 import Swal from 'sweetalert2';
+import { motion as Motion, AnimatePresence } from 'motion/react'
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
 
 export default function Reports() {
   const { user } = useAuth();
@@ -27,9 +43,10 @@ export default function Reports() {
         return { start: startOfWeek(today), end: today };
       case '30days':
         return { start: subDays(today, 30), end: today };
-      case 'lastMonth':
+      case 'lastMonth': {
         const lastM = subMonths(today, 1);
         return { start: startOfMonth(lastM), end: endOfMonth(lastM) };
+      }
       case 'year':
         return { start: startOfYear(today), end: today };
       case 'month':
@@ -38,14 +55,8 @@ export default function Reports() {
     }
   }, [timeframe]);
 
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user, dateRange]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!user) return;
     try {
       setLoading(true);
       
@@ -78,11 +89,18 @@ export default function Reports() {
         title: 'Oops...',
         text: 'Failed to load report data. Please try again.',
         confirmButtonColor: '#EC4899',
+        customClass: {
+          popup: 'rounded-[2.5rem]'
+        }
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, dateRange]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Derive providers from fetched transactions to populate the sub-filter
   const availableProviders = useMemo(() => {
@@ -145,13 +163,24 @@ export default function Reports() {
 
   return (
     <Layout>
-      <div className="space-y-10 pb-20">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <Motion.div 
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="space-y-10 pb-20"
+      >
+        <Motion.header 
+          variants={item}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-200">
+              <Motion.div 
+                whileHover={{ rotate: 10, scale: 1.1 }}
+                className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-200"
+              >
                  <Icon name="reports" color="white" className="w-6 h-6" />
-              </div>
+              </Motion.div>
               <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">Financial Insights</h1>
             </div>
             <p className="text-gray-500 font-medium italic">
@@ -162,7 +191,10 @@ export default function Reports() {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Provider Filter */}
             {availableProviders.length > 0 && (
-              <div className="relative">
+              <Motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="relative"
+              >
                 <select
                   value={filterProvider}
                   onChange={(e) => setFilterProvider(e.target.value)}
@@ -176,11 +208,14 @@ export default function Reports() {
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-pink-400">
                   <Icon name="chevronDown" className="w-4 h-4" />
                 </div>
-              </div>
+              </Motion.div>
             )}
 
             {/* Timeframe Filter */}
-            <div className="relative">
+            <Motion.div 
+              whileHover={{ scale: 1.02 }}
+              className="relative"
+            >
               <select
                 value={timeframe}
                 onChange={(e) => setTimeframe(e.target.value)}
@@ -195,23 +230,33 @@ export default function Reports() {
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-pink-500">
                 <Icon name="calendar" className="w-4 h-4" />
               </div>
-            </div>
+            </Motion.div>
           </div>
-        </header>
+        </Motion.header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Summary & Allocation */}
           <div className="lg:col-span-1 space-y-8">
-            <ReportSummary summary={summary} />
-            <AllocationChart data={categoryData} />
+            <Motion.div variants={item}>
+              <ReportSummary summary={summary} />
+            </Motion.div>
+            <Motion.div variants={item}>
+              <AllocationChart data={categoryData} />
+            </Motion.div>
           </div>
 
           {/* Right Column: Trends */}
           <div className="lg:col-span-2 space-y-8">
-            < SpendingChart data={trendData} />
+            <Motion.div variants={item}>
+              < SpendingChart data={trendData} />
+            </Motion.div>
             
             {/* Recent Performance Note */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 rounded-[3rem] p-10 text-white shadow-2xl group">
+            <Motion.div 
+              variants={item}
+              whileHover={{ y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 rounded-[3rem] p-10 text-white shadow-2xl group"
+            >
               <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/20 rounded-full translate-x-20 translate-y-[-20px] blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-6">
@@ -220,26 +265,40 @@ export default function Reports() {
                 </div>
                 
                 <h4 className="text-2xl md:text-3xl font-black mb-4 tracking-tighter">Pulse Check</h4>
-                <p className="text-gray-400 font-medium mb-8 leading-relaxed max-w-xl">
-                  You've managed a total flow of <span className="text-white font-bold text-lg">₱{summary.expense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> in expenses. 
-                   {" "}{getPulseMessage()}
-                </p>
+                <AnimatePresence mode="wait">
+                  <Motion.p 
+                    key={getPulseMessage()}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-gray-400 font-medium mb-8 leading-relaxed max-w-xl"
+                  >
+                    You've managed a total flow of <span className="text-white font-bold text-lg">₱{summary.expense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> in expenses. 
+                    {" "}{getPulseMessage()}
+                  </Motion.p>
+                </AnimatePresence>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                   <div className="p-4 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
+                   <Motion.div 
+                     whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                     className="p-4 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm"
+                   >
                      <p className="text-[10px] font-black text-pink-400 uppercase tracking-widest mb-1">Savings Rate</p>
                      <p className="text-2xl font-black">{savingsRate}{savingsRate !== "N/A" && "%"}</p>
-                   </div>
-                   <div className="p-4 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
+                   </Motion.div>
+                   <Motion.div 
+                     whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                     className="p-4 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm"
+                   >
                      <p className="text-[10px] font-black text-pink-400 uppercase tracking-widest mb-1">Burn Rate</p>
                      <p className="text-2xl font-black">{burnRate}{burnRate !== "N/A" && "%"}</p>
-                   </div>
+                   </Motion.div>
                 </div>
               </div>
-            </div>
+            </Motion.div>
           </div>
         </div>
-      </div>
+      </Motion.div>
     </Layout>
   );
 }

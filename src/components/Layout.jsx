@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Icon from "./Icon";
 import Swal from "sweetalert2";
+import AnimatedPage from "./common/AnimatedPage";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: "bank" },
@@ -149,7 +150,9 @@ export default function Layout({ children }) {
 
       {/* Main Content */}
       <main className="flex-1 w-full relative">
-        <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12">{children}</div>
+        <AnimatedPage className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12">
+          {children}
+        </AnimatedPage>
       </main>
 
       {/* Mobile Navigation */}

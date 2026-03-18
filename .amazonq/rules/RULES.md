@@ -67,6 +67,7 @@ Update this progress as you move through the work.
     - **Supabase MCP**: Use for database migrations (`apply_migration`), executing SQL (`execute_sql`), managing Edge Functions (`deploy_edge_function`), and checking logs.
     - **Netlify MCP**: Use for managing site deployments (`deploy-site`), configuring environment variables (`manage-env-vars`), and checking deployment status.
 - ⚛️ **Use TanStack Query (React Query)** for all server state management (fetching, caching, synchronization, and mutations). Avoid complex `useEffect` chains for data fetching.
+- ✨ **Framer Motion Convention**: When using Framer Motion, always use the `Motion` alias for consistency: `import { motion as Motion } from 'motion/react'`. Use `AnimatePresence` for exit animations.
 
 ---
 
@@ -105,11 +106,13 @@ User Action → React Component → Supabase Client → PostgreSQL + RLS → Rea
 
 ### Design System
 
+- **Technologies**: React 19, Supabase, Tailwind CSS, TanStack Query, Framer Motion
 - **Theme**: Light pink aesthetic (#FFC0CB, #FFB6C1, #FFF0F5)
 - **Framework**: Tailwind CSS with custom pink color palette
+- **Animations**: Framer Motion (`motion/react`) for all transitions and micro-interactions
 - **Icons**: Lucide React for consistent, theme-aware iconography
 - **Notifications**: SweetAlert2 for premium, themed dialogs
-- **Components**: Card-based UI with mobile-first responsive design
+- **Components**: Card-based UI with premium glassmorphism (blur spots, overlays, gradients)
 - **Accessibility**: WCAG compliant contrast ratios on pink backgrounds
 
 ### Implementation Priority

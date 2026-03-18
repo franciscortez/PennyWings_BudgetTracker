@@ -9,6 +9,7 @@ import WalletList from '../components/wallets/WalletList'
 import AccountWizard from '../components/accounts/AccountWizard'
 import EditAccountModal from '../components/accounts/EditAccountModal'
 import Icon from '../components/Icon'
+import { motion as Motion, AnimatePresence } from 'motion/react'
 
 export default function Accounts() {
   const { cards, loading: loadingCards, addCard, updateCard, deleteCard } = useBankCards()
@@ -161,10 +162,14 @@ export default function Accounts() {
 
   return (
     <Layout>
-      <div className="mb-8">
+      <Motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">My Accounts</h1>
         <p className="text-gray-500">Manage your bank cards and digital wallets in one place.</p>
-      </div>
+      </Motion.div>
 
       <TotalBalance 
         total={totalBalance} 
@@ -172,73 +177,35 @@ export default function Accounts() {
       />
 
       {/* Search & Tabs */}
-      <div className="flex flex-col md:flex-row gap-4 mb-10 items-center justify-between">
+      <Motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="flex flex-col md:flex-row gap-4 mb-10 items-center justify-between"
+      >
         <div className="flex gap-2 p-1.5 bg-pink-100/30 backdrop-blur-md rounded-[2rem] border border-pink-100 w-full overflow-x-auto no-scrollbar md:w-fit whitespace-nowrap snap-x">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
-              activeTab === 'all'
-                ? 'bg-white text-pink-600 shadow-xl shadow-pink-200/50 scale-105'
-                : 'text-gray-400 hover:text-pink-400'
-            }`}
-          >
-            <Icon name="grid" color="currentColor" className="w-5 h-5" />
-            All
-            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
-              activeTab === 'all' ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400'
-            }`}>
-              {filteredCards.length + wallets.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('cards')}
-            className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
-              activeTab === 'cards'
-                ? 'bg-white text-pink-600 shadow-xl shadow-pink-200/50 scale-105'
-                : 'text-gray-400 hover:text-pink-400'
-            }`}
-          >
-            <Icon name="card" color="currentColor" className="w-5 h-5" />
-            Bank Cards
-            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
-              activeTab === 'cards' ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400'
-            }`}>
-              {filteredCards.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('wallets')}
-            className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
-              activeTab === 'wallets'
-                ? 'bg-white text-pink-600 shadow-xl shadow-pink-200/50 scale-105'
-                : 'text-gray-400 hover:text-pink-400'
-            }`}
-          >
-            <Icon name="wallet" color="currentColor" className="w-5 h-5" />
-            E-Wallets
-            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
-              activeTab === 'wallets' ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400'
-            }`}>
-              {wallets.filter(w => w.wallet_type !== 'cash').length}
-            </span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('cash')}
-            className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
-              activeTab === 'cash'
-                ? 'bg-white text-pink-600 shadow-xl shadow-pink-200/50 scale-105'
-                : 'text-gray-400 hover:text-pink-400'
-            }`}
-          >
-            <Icon name="cash" color="currentColor" className="w-5 h-5" />
-            Cash
-            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
-              activeTab === 'cash' ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400'
-            }`}>
-              {wallets.filter(w => w.wallet_type === 'cash').length}
-            </span>
-          </button>
+          {['all', 'cards', 'wallets', 'cash'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
+                activeTab === tab
+                  ? 'bg-white text-pink-600 shadow-xl shadow-pink-200/50 scale-105'
+                  : 'text-gray-400 hover:text-pink-400'
+              }`}
+            >
+              <Icon name={tab === 'all' ? 'grid' : tab === 'cards' ? 'card' : tab === 'wallets' ? 'wallet' : 'cash'} color="currentColor" className="w-5 h-5" />
+              {tab.charAt(0).toUpperCase() + tab.slice(1).replace('all', 'All').replace('cards', 'Bank Cards').replace('wallets', 'E-Wallets')}
+              <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
+                activeTab === tab ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400'
+              }`}>
+                {tab === 'all' ? filteredCards.length + wallets.length : 
+                 tab === 'cards' ? filteredCards.length :
+                 tab === 'wallets' ? wallets.filter(w => w.wallet_type !== 'cash').length :
+                 wallets.filter(w => w.wallet_type === 'cash').length}
+              </span>
+            </button>
+          ))}
         </div>
 
         <div className="relative w-full md:w-64">
@@ -250,60 +217,70 @@ export default function Accounts() {
             className="w-full px-5 py-3 bg-white border border-pink-100 rounded-2xl focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 outline-none transition-all font-bold text-gray-700 text-sm"
           />
         </div>
-      </div>
+      </Motion.div>
 
       {/* Content Area */}
       <div className="pb-20">
-        {activeTab === 'all' ? (
-          <div className="space-y-12">
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600">
-                  <Icon name="card" className="w-4 h-4" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">Bank Cards</h3>
+        <AnimatePresence mode="wait">
+          <Motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'all' ? (
+              <div className="space-y-12">
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600">
+                      <Icon name="card" className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800">Bank Cards</h3>
+                  </div>
+                  <CardList 
+                    cards={filteredCards} 
+                    loading={loadingCards} 
+                    onEdit={handleEditCard}
+                    onDelete={handleDeleteCard}
+                  />
+                </section>
+                
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600">
+                      <Icon name="wallet" className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800">Digital Wallets & Cash</h3>
+                  </div>
+                  <WalletList 
+                    wallets={wallets.filter(w => 
+                      w.wallet_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (w.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase())
+                    )} 
+                    loading={loadingWallets} 
+                    onEdit={handleEditWallet}
+                    onDelete={handleDeleteWallet}
+                  />
+                </section>
               </div>
+            ) : activeTab === 'cards' ? (
               <CardList 
                 cards={filteredCards} 
                 loading={loadingCards} 
                 onEdit={handleEditCard}
                 onDelete={handleDeleteCard}
               />
-            </section>
-            
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600">
-                  <Icon name="wallet" className="w-4 h-4" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">Digital Wallets & Cash</h3>
-              </div>
+            ) : (
               <WalletList 
-                wallets={wallets.filter(w => 
-                  w.wallet_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  (w.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase())
-                )} 
+                wallets={filteredWallets} 
                 loading={loadingWallets} 
                 onEdit={handleEditWallet}
                 onDelete={handleDeleteWallet}
               />
-            </section>
-          </div>
-        ) : activeTab === 'cards' ? (
-          <CardList 
-            cards={filteredCards} 
-            loading={loadingCards} 
-            onEdit={handleEditCard}
-            onDelete={handleDeleteCard}
-          />
-        ) : (
-          <WalletList 
-            wallets={filteredWallets} 
-            loading={loadingWallets} 
-            onEdit={handleEditWallet}
-            onDelete={handleDeleteWallet}
-          />
-        )}
+            )}
+          </Motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Unified Wizard */}
