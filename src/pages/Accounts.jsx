@@ -14,7 +14,7 @@ export default function Accounts() {
   const { cards, loading: loadingCards, addCard, updateCard, deleteCard } = useBankCards()
   const { wallets, loading: loadingWallets, addWallet, updateWallet, deleteWallet } = useEWallets()
   
-  const [activeTab, setActiveTab] = useState('cards')
+  const [activeTab, setActiveTab] = useState('all')
   const [isWizardOpen, setIsWizardOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [editTarget, setEditTarget] = useState(null) // { account, type: 'card' | 'wallet' }
@@ -175,6 +175,22 @@ export default function Accounts() {
       <div className="flex flex-col md:flex-row gap-4 mb-10 items-center justify-between">
         <div className="flex gap-2 p-1.5 bg-pink-100/30 backdrop-blur-md rounded-[2rem] border border-pink-100 w-full overflow-x-auto no-scrollbar md:w-fit whitespace-nowrap snap-x">
           <button
+            onClick={() => setActiveTab('all')}
+            className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
+              activeTab === 'all'
+                ? 'bg-white text-pink-600 shadow-xl shadow-pink-200/50 scale-105'
+                : 'text-gray-400 hover:text-pink-400'
+            }`}
+          >
+            <Icon name="grid" color="currentColor" className="w-5 h-5" />
+            All
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
+              activeTab === 'all' ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400'
+            }`}>
+              {filteredCards.length + wallets.length}
+            </span>
+          </button>
+          <button
             onClick={() => setActiveTab('cards')}
             className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
               activeTab === 'cards'
@@ -238,7 +254,42 @@ export default function Accounts() {
 
       {/* Content Area */}
       <div className="pb-20">
-        {activeTab === 'cards' ? (
+        {activeTab === 'all' ? (
+          <div className="space-y-12">
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600">
+                  <Icon name="card" className="w-4 h-4" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Bank Cards</h3>
+              </div>
+              <CardList 
+                cards={filteredCards} 
+                loading={loadingCards} 
+                onEdit={handleEditCard}
+                onDelete={handleDeleteCard}
+              />
+            </section>
+            
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600">
+                  <Icon name="wallet" className="w-4 h-4" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Digital Wallets & Cash</h3>
+              </div>
+              <WalletList 
+                wallets={wallets.filter(w => 
+                  w.wallet_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  (w.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase())
+                )} 
+                loading={loadingWallets} 
+                onEdit={handleEditWallet}
+                onDelete={handleDeleteWallet}
+              />
+            </section>
+          </div>
+        ) : activeTab === 'cards' ? (
           <CardList 
             cards={filteredCards} 
             loading={loadingCards} 
