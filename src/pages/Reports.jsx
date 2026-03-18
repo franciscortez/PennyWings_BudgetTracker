@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { format, startOfMonth, endOfMonth, startOfYear, startOfWeek, subDays, subMonths } from 'date-fns';
 import { getCategoryData, getTrendData, getReportSummary } from '../utils/reportUtils';
 import Layout from '../components/Layout';

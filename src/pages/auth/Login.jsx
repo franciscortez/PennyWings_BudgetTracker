@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"; // trigger-reload
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import Swal from 'sweetalert2'
 
 export default function Login() {
