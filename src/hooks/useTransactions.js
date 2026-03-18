@@ -19,23 +19,40 @@ const applyBalanceDelta = async (cardId, walletId, delta) => {
   }
 };
 
-export const useTransactions = (limit = 10) => {
+export const useTransactions = ({ page = 1, pageSize = 10, search = '', type = 'all' } = {}) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const transactionsQuery = useQuery({
-    queryKey: ["transactions", user?.id, limit],
+    queryKey: ["transactions", user?.id, page, pageSize, search, type],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      let query = supabase
         .from("transactions")
-        .select(TX_SELECT)
+        .select(TX_SELECT, { count: 'exact' })
         .eq("user_id", user?.id)
         .order("transaction_date", { ascending: false })
         .order("created_at", { ascending: false })
-        .limit(limit);
+        .range(from, to);
+
+      if (type !== 'all') {
+        query = query.eq('type', type);
+      }
+
+      if (search) {
+        query = query.ilike('description', `%${search}%`);
+      }
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
-      return data || [];
+      return { 
+        data: data || [], 
+        totalCount: count || 0,
+        totalPages: Math.ceil((count || 0) / pageSize)
+      };
     },
     enabled: !!user,
   });
@@ -149,8 +166,12 @@ export const useTransactions = (limit = 10) => {
     }
   }, [user, queryClient, invalidateAll]);
 
+  const queryResult = transactionsQuery.data || { data: [], totalCount: 0, totalPages: 0 };
+
   return {
-    transactions: transactionsQuery.data || [],
+    transactions: queryResult.data,
+    totalCount: queryResult.totalCount,
+    totalPages: queryResult.totalPages,
     loading: transactionsQuery.isLoading || addMutation.isPending || deleteMutation.isPending || updateMutation.isPending,
     error: transactionsQuery.error || addMutation.error || deleteMutation.error || updateMutation.error,
     addTransaction: addMutation.mutateAsync,

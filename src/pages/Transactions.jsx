@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom';
 import Layout from "../components/Layout";
 import { useTransactions } from "../hooks/useTransactions";
 import TransactionForm from "../components/transactions/TransactionForm";
@@ -22,12 +23,30 @@ const staggerContainer = {
 };
 
 export default function Transactions() {
-  const { transactions, loading, addTransaction, deleteTransaction } = useTransactions(100);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // URL-synced states
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const filterType = searchParams.get('type') || 'all';
+  const searchQuery = searchParams.get('search') || '';
+  
+  const pageSize = 10;
+
+  const { 
+    transactions, 
+    totalCount,
+    totalPages,
+    loading, 
+    addTransaction, 
+    deleteTransaction 
+  } = useTransactions({ 
+    page, 
+    pageSize, 
+    search: searchQuery, 
+    type: filterType 
+  });
+
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   const handleAddTransaction = async (data) => {
     const { error } = await addTransaction(data);
@@ -78,29 +97,30 @@ export default function Transactions() {
     });
   };
 
-  const filteredTransactions = transactions?.filter(tx => {
-    const matchesSearch = (tx.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (tx.category?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === "all" || tx.type === filterType;
-    return matchesSearch && matchesType;
-  }) || [];
-
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const paginatedTransactions = filteredTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Use event handlers for state updates to avoid useEffect setState overhead/warnings
+  // State update handlers that sync with URL
   const onSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    if (currentPage !== 1) setCurrentPage(1);
+    const value = e.target.value;
+    setSearchParams(prev => {
+      if (value) prev.set('search', value);
+      else prev.delete('search');
+      prev.set('page', '1'); // Reset to page 1 on search
+      return prev;
+    }, { replace: true });
   };
 
   const onFilterChange = (type) => {
-    setFilterType(type);
-    if (currentPage !== 1) setCurrentPage(1);
+    setSearchParams(prev => {
+      prev.set('type', type);
+      prev.set('page', '1'); // Reset to page 1 on filter
+      return prev;
+    });
+  };
+
+  const onPageChange = (newPage) => {
+    setSearchParams(prev => {
+      prev.set('page', newPage.toString());
+      return prev;
+    });
   };
 
   return (
@@ -179,7 +199,7 @@ export default function Transactions() {
               <div className="w-12 h-12 border-4 border-pink-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
               <p className="text-gray-400 font-black tracking-widest uppercase animate-pulse text-xs">Fetching Ledger...</p>
             </div>
-          ) : filteredTransactions.length > 0 ? (
+          ) : transactions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left">
                 <thead>
@@ -198,7 +218,7 @@ export default function Transactions() {
                   className="divide-y divide-pink-50"
                 >
                   <AnimatePresence mode="popLayout">
-                    {paginatedTransactions.map(tx => (
+                    {transactions.map(tx => (
                       <Motion.tr 
                         key={tx.id} 
                         variants={fadeInUp}
@@ -272,40 +292,50 @@ export default function Transactions() {
           {totalPages > 1 && (
             <div className="px-8 py-6 bg-pink-50/30 border-t border-pink-100 flex items-center justify-between">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Showing <span className="text-pink-500">{(currentPage-1)*itemsPerPage + 1}</span> to <span className="text-pink-500">{Math.min(currentPage*itemsPerPage, filteredTransactions.length)}</span> of {filteredTransactions.length}
+                Showing <span className="text-pink-500">{(page - 1) * pageSize + 1}</span> to <span className="text-pink-500">{Math.min(page * pageSize, totalCount)}</span> of {totalCount}
               </p>
               <div className="flex gap-2">
                 <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
+                  onClick={() => onPageChange(Math.max(1, page - 1))}
+                  disabled={page === 1}
                   className="p-3 rounded-xl bg-white border border-pink-100 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition-all disabled:opacity-30"
                 >
                   <Icon name="arrowLeft" className="w-4 h-4" />
                 </Motion.button>
-                <div className="flex gap-1">
-                  {[...Array(totalPages)].map((_, i) => (
-                    <Motion.button
-                      key={i}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
-                        currentPage === i + 1
-                          ? 'bg-pink-500 text-white shadow-lg'
-                          : 'bg-white border border-pink-100 text-gray-400 hover:bg-pink-50'
-                      }`}
-                    >
-                      {i + 1}
-                    </Motion.button>
-                  ))}
+                <div className="hidden sm:flex gap-1">
+                  {[...Array(totalPages)].map((_, i) => {
+                    const p = i + 1;
+                    // Improved pagination logic for many pages
+                    if (totalPages > 7) {
+                      if (p > 1 && p < totalPages && (p < page - 1 || p > page + 1)) {
+                        if (p === 2 || p === totalPages - 1) return <span key={p} className="w-10 h-10 flex items-center justify-center text-gray-300">...</span>;
+                        return null;
+                      }
+                    }
+                    return (
+                      <Motion.button
+                        key={p}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => onPageChange(p)}
+                        className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
+                          page === p
+                            ? 'bg-pink-500 text-white shadow-lg'
+                            : 'bg-white border border-pink-100 text-gray-400 hover:bg-pink-50'
+                        }`}
+                      >
+                        {p}
+                      </Motion.button>
+                    );
+                  })}
                 </div>
                 <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
                   className="p-3 rounded-xl bg-white border border-pink-100 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition-all rotate-180 disabled:opacity-30"
                 >
                   <Icon name="arrowLeft" className="w-4 h-4" />

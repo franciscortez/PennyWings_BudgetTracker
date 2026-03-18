@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { format, startOfMonth, endOfMonth, startOfYear, startOfWeek, subDays, subMonths } from 'date-fns';
 import { getCategoryData, getTrendData, getReportSummary } from '../utils/reportUtils';
+import { useReportData } from '../hooks/useReportData';
 import Layout from '../components/Layout';
 import ReportSummary from '../components/reports/ReportSummary';
 import SpendingChart from '../components/reports/SpendingChart';
@@ -10,6 +11,7 @@ import AllocationChart from '../components/reports/AllocationChart';
 import Icon from '../components/Icon';
 import Swal from 'sweetalert2';
 import { motion as Motion, AnimatePresence } from 'motion/react'
+import SkeletonLoader from '../components/common/SkeletonLoader';
 
 const container = {
   hidden: { opacity: 0 },
@@ -28,8 +30,6 @@ const item = {
 
 export default function Reports() {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [allTransactions, setAllTransactions] = useState([]);
   
   // Filtering States
   const [timeframe, setTimeframe] = useState('month'); 
@@ -55,35 +55,16 @@ export default function Reports() {
     }
   }, [timeframe]);
 
-  const fetchData = useCallback(async () => {
-    if (!user) return;
-    try {
-      setLoading(true);
-      
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(`
-          *,
-          categories (
-            name
-          ),
-          bank_cards (
-            id, card_name
-          ),
-          e_wallets (
-            id, wallet_name
-          )
-        `)
-        .eq('user_id', user.id)
-        .gte('transaction_date', format(dateRange.start, 'yyyy-MM-dd'))
-        .lte('transaction_date', format(dateRange.end, 'yyyy-MM-dd'))
-        .order('transaction_date', { ascending: true });
+  // Use TanStack Query hook for data fetching
+  const { 
+    data: allTransactions = [], 
+    isLoading, 
+    error: fetchError 
+  } = useReportData(dateRange);
 
-      if (error) throw error;
-      setAllTransactions(data || []);
-      
-    } catch (error) {
-      console.error('Error fetching report data:', error);
+  useEffect(() => {
+    if (fetchError) {
+      console.error('Error fetching report data:', fetchError);
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -93,14 +74,8 @@ export default function Reports() {
           popup: 'rounded-[2.5rem]'
         }
       });
-    } finally {
-      setLoading(false);
     }
-  }, [user, dateRange]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  }, [fetchError]);
 
   // Derive providers from fetched transactions to populate the sub-filter
   const availableProviders = useMemo(() => {
@@ -151,11 +126,31 @@ export default function Reports() {
     return "Your pennies are flying a bit too fast. Let's aim for a calmer flight going forward.";
   };
 
-  if (loading && allTransactions.length === 0) {
+  if (isLoading && allTransactions.length === 0) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-12 h-12 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin"></div>
+        <div className="space-y-10 pb-20">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-2">
+              <SkeletonLoader className="w-48 h-10 rounded-xl" />
+              <SkeletonLoader className="w-64 h-5 rounded-lg" />
+            </div>
+            <div className="flex gap-4">
+              <SkeletonLoader className="w-32 h-12 rounded-[2rem]" />
+              <SkeletonLoader className="w-32 h-12 rounded-[2rem]" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1 space-y-8">
+              <SkeletonLoader className="w-full h-64 rounded-[3rem]" />
+              <SkeletonLoader className="w-full h-80 rounded-[3rem]" />
+            </div>
+            <div className="lg:col-span-2 space-y-8">
+              <SkeletonLoader className="w-full h-[400px] rounded-[3rem]" />
+              <SkeletonLoader className="w-full h-64 rounded-[3rem]" />
+            </div>
+          </div>
         </div>
       </Layout>
     );
