@@ -19,7 +19,9 @@ import {
   LogOut,
   ArrowLeft,
   Banknote,
-  BarChart2,
+  TrendingUp,
+  Menu,
+  Settings,
 } from "lucide-react";
 
 const icons = {
@@ -43,7 +45,9 @@ const icons = {
   logout: LogOut,
   arrowLeft: ArrowLeft,
   cash: Banknote,
-  reports: BarChart2,
+  reports: TrendingUp,
+  menu: Menu,
+  settings: Settings,
 };
 
 const Icon = ({
