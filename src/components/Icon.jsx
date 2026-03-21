@@ -17,6 +17,7 @@ import {
   User,
   X,
   LogOut,
+  Lock,
   ArrowLeft,
   Banknote,
   TrendingUp,
@@ -26,6 +27,7 @@ import {
   Sun,
   History,
   ArrowRightLeft,
+  ChevronDown,
 } from "lucide-react";
 
 const icons = {
@@ -47,6 +49,7 @@ const icons = {
   user: User,
   x: X,
   logout: LogOut,
+  lock: Lock,
   arrowLeft: ArrowLeft,
   cash: Banknote,
   reports: TrendingUp,
@@ -56,6 +59,7 @@ const icons = {
   sun: Sun,
   history: History,
   exchange: ArrowRightLeft,
+  chevronDown: ChevronDown,
 };
 
 const Icon = ({
