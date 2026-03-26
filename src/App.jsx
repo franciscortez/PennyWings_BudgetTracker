@@ -19,6 +19,7 @@ const Accounts = lazy(() => import('./pages/Accounts'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Reports = lazy(() => import('./pages/Reports'))
 const Monitoring = lazy(() => import('./pages/Monitoring'))
+const Calculator = lazy(() => import('./pages/Calculator'))
 
 
 
@@ -82,6 +83,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <Monitoring />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/calculator"
+                  element={
+                    <ProtectedRoute>
+                      <Calculator />
                     </ProtectedRoute>
                   }
                 />

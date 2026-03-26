@@ -12,6 +12,7 @@ import { motion as Motion } from "motion/react";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: "bank" },
   { name: "Accounts", href: "/accounts", icon: "card" },
+  { name: "Calculator", href: "/calculator", icon: "plus" },
   { 
     name: "Transactions", 
     href: "/transactions", 
@@ -231,7 +232,7 @@ export default function Layout({ children }) {
       </main>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-card border-t border-pink-100 dark:border-dark-border flex justify-around p-2 z-50 transition-colors">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-card border-t border-pink-100 dark:border-dark-border flex flex-nowrap overflow-x-auto no-scrollbar justify-between sm:justify-around p-1 sm:p-2 z-50 transition-colors">
         {navigation.filter(item => item.name !== "Settings").map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -239,12 +240,12 @@ export default function Layout({ children }) {
               key={item.name}
               to={item.href}
               onMouseEnter={() => item.prefetch?.()}
-              className={`flex flex-col items-center justify-center flex-1 px-1 py-2 rounded-xl transition-all text-center ${
-                isActive ? "text-pink-600 dark:text-pink-400" : "text-gray-400 dark:text-dark-muted"
+              className={`flex flex-col items-center justify-center flex-1 min-w-[52px] px-0.5 sm:px-1 py-2 sm:py-2.5 rounded-xl transition-all text-center ${
+                isActive ? "text-pink-600 dark:text-pink-400 bg-pink-50/50 dark:bg-dark-border/30" : "text-gray-400 dark:text-dark-muted hover:text-pink-500"
               }`}
             >
-              <Icon name={item.icon} color="currentColor" className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-[9px] sm:text-[10px] font-bold mt-1 uppercase tracking-tight sm:tracking-wider truncate w-full px-0.5">
+              <Icon name={item.icon} color="currentColor" className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5" />
+              <span className="text-[8px] sm:text-[9.5px] font-extrabold uppercase tracking-tighter truncate w-full px-0.5">
                 {item.name}
               </span>
             </Link>

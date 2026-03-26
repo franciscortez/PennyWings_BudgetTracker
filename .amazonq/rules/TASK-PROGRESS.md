@@ -35,6 +35,31 @@ Added a new specialized expense category titled "Date" to the `categories` table
 **Outcome:**
 - The "Date" category is now globally available in the application's transaction forms for expense-type entries.
 
+### Calculator Utility Addition - 2026-03-26
+
+**Status:** ✅ Completed
+
+**Description:**
+Created a new basic Calculator utility page built with React state and enhanced with Framer Motion animations and glassmorphism styling to match the project's premium aesthetic. Integrated the page into the main navigation flow.
+
+**Files Modified/Created:**
+- `src/pages/Calculator.jsx` [NEW]
+- `src/App.jsx` [MODIFIED] (Added routing)
+- `src/components/Layout.jsx` [MODIFIED] (Added to sidebar/navigation menu)
+
+**Outcome:**
+- Users can access the Calculator from the sidebar to quickly compute values for their budgeting needs.
+
+### Production Deployment - 2026-03-26
+
+**Status:** ✅ Completed
+
+**Description:**
+Triggered a production build (`npm run build`) and successfully deployed the `dist/` directory to the `penny-wings` Netlify project via the MCP deployment updater. 
+
+**Outcome:**
+- The latest changes (including 'Date' category, Calculator, and mobile layout fixes) are now live at `https://penny-wings.netlify.app`.
+
 ---
 
 ## 🎯 Current Task
