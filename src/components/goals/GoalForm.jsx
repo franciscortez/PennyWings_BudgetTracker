@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../Icon';
-import { motion as Motion, AnimatePresence } from 'motion/react';
 import { getToast } from '../../utils/toast';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useBankCards } from '../../hooks/useBankCards';
-import { useEWallets } from '../../hooks/useEWallets';
 
-const GoalForm = ({ goal, onSubmit, onCancel, loading }) => {
+const GoalForm = ({ goal, onSubmit, onCancel, loading, cards = [], wallets = [] }) => {
   const { theme } = useTheme();
-  const { cards } = useBankCards();
-  const { wallets } = useEWallets();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -65,18 +60,10 @@ const GoalForm = ({ goal, onSubmit, onCancel, loading }) => {
   };
 
   return (
-    <Motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-md"
-    >
-      <Motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white dark:bg-dark-card w-full md:max-w-lg rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border border-pink-50 dark:border-dark-border flex flex-col max-h-[95vh] md:max-h-[90vh]"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4">
+      <div onClick={onCancel} className="absolute inset-0 bg-black/60 animate-fade-in" />
+      <div
+        className="bg-white dark:bg-dark-card w-full md:max-w-lg rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border border-pink-50 dark:border-dark-border flex flex-col max-h-[95vh] md:max-h-[90vh] animate-scale-in relative z-10"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
@@ -202,8 +189,8 @@ const GoalForm = ({ goal, onSubmit, onCancel, loading }) => {
             </div>
           </form>
         </div>
-      </Motion.div>
-    </Motion.div>
+      </div>
+    </div>
 
   );
 };

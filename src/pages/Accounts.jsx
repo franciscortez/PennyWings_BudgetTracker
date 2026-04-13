@@ -199,10 +199,7 @@ export default function Accounts() {
 
       {/* Content Area */}
       <div className="pb-20">
-        <div
-            key={activeTab}
-            className="opacity-100"
-          >
+        <div key={activeTab} className="animate-fade-in">
             {activeTab === 'all' ? (
               <div className="space-y-12">
                 <section>

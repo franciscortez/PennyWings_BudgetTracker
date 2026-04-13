@@ -308,36 +308,24 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
     <AnimatePresence initial={false}>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <Motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={onClose}
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/40 animate-fade-in"
           />
-          <Motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 5 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="bg-white dark:bg-dark-card w-full max-w-md rounded-[2.5rem] border border-pink-100 dark:border-dark-border overflow-hidden relative z-10 flex flex-col max-h-[95vh] md:max-h-[90vh]"
+          <div
+            className="bg-white dark:bg-dark-card w-full max-w-md rounded-[2.5rem] border border-pink-100 dark:border-dark-border overflow-hidden relative z-10 flex flex-col max-h-[95vh] md:max-h-[90vh] animate-scale-in"
           >
             {/* Header */}
             <div className="p-6 sm:p-8 pb-4 flex justify-between items-center border-b border-pink-50 dark:border-dark-border">
               <div className="flex items-center gap-2">
-                <AnimatePresence mode="wait" initial={false}>
-                  {step > 1 && (
-                    <Motion.button
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      onClick={handleBack}
-                      className="p-2 hover:bg-pink-50 dark:hover:bg-dark-bg rounded-full text-gray-400 dark:text-dark-muted transition-colors"
-                    >
-                      <Icon name="arrowLeft" color="currentColor" className="w-5 h-5" />
-                    </Motion.button>
-                  )}
-                </AnimatePresence>
+                {step > 1 && (
+                  <button
+                    onClick={handleBack}
+                    className="p-2 hover:bg-pink-50 dark:hover:bg-dark-bg rounded-full text-gray-400 dark:text-dark-muted transition-colors active:scale-90"
+                  >
+                    <Icon name="arrowLeft" color="currentColor" className="w-5 h-5" />
+                  </button>
+                )}
                 <h2 className="text-2xl font-black text-gray-800 dark:text-white tracking-tight">
                   {formData.type === 'cash' ? 'Cash on Hand' : `Step ${step} of 3`}
                 </h2>
@@ -359,20 +347,18 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
                     key={s}
                     className="h-2 flex-1 rounded-full bg-pink-100 dark:bg-dark-bg relative overflow-hidden"
                   >
-                    <Motion.div
-                      initial={false}
-                      animate={{
+                    <div
+                      className="absolute inset-0 bg-pink-500 transition-all duration-200 ease-out"
+                      style={{
                         width: (formData.type === 'cash' ? s <= 3 : s <= step) ? "100%" : "0%"
                       }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className="absolute inset-0 bg-pink-500"
                     />
                   </div>
                 ))}
               </div>
 
               <form onSubmit={handleSubmitInternal} className="space-y-6">
-                <AnimatePresence mode="wait" initial={false}>
+                <div key={step} className="animate-fade-in">
                   {step === 1 && (
                     <Step1
                       formData={formData}
@@ -395,10 +381,10 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
                       loading={loading}
                     />
                   )}
-                </AnimatePresence>
+                </div>
               </form>
             </div>
-          </Motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

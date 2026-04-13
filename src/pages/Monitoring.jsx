@@ -7,6 +7,8 @@ import GoalForm from "../components/goals/GoalForm";
 import { useBudgets } from "../hooks/useBudgets";
 import { useBudgetStats } from "../hooks/useBudgetStats";
 import { useGoals } from "../hooks/useGoals";
+import { useBankCards } from "../hooks/useBankCards";
+import { useEWallets } from "../hooks/useEWallets";
 import { getToast } from "../utils/toast";
 import { getConfirm, confirmPresets } from "../utils/confirm";
 import { useTheme } from "../contexts/ThemeContext";
@@ -37,6 +39,8 @@ export default function Monitoring() {
 
   // Goals State & Logic
   const { goals, loading: goalsLoading, addGoal, updateGoal, deleteGoal } = useGoals();
+  const { cards } = useBankCards();
+  const { wallets } = useEWallets();
   const [isGoalFormOpen, setIsGoalFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [isSubmittingGoal, setIsSubmittingGoal] = useState(false);
@@ -148,7 +152,8 @@ export default function Monitoring() {
           </header>
 
           <div>
-            {activeTab === 'goals' ? (
+            <div key={activeTab} className="animate-fade-in">
+              {activeTab === 'goals' ? (
               <GoalList 
                   goals={goals} 
                   loading={goalsLoading}
@@ -156,16 +161,17 @@ export default function Monitoring() {
                   onDelete={handleGoalDelete}
                   onAdd={() => { setEditingGoal(null); setIsGoalFormOpen(true); }}
                 />
-            ) : (
-              <BudgetList 
-                  budgets={budgets} 
-                  stats={budgetStats} 
-                  loading={budgetsLoading || statsLoading}
-                  onEdit={(b) => { setEditingBudget(b); setIsBudgetFormOpen(true); }}
-                  onDelete={handleBudgetDelete}
-                  onAdd={() => { setEditingBudget(null); setIsBudgetFormOpen(true); }}
-                />
-            )}
+              ) : (
+                <BudgetList 
+                    budgets={budgets} 
+                    stats={budgetStats} 
+                    loading={budgetsLoading || statsLoading}
+                    onEdit={(b) => { setEditingBudget(b); setIsBudgetFormOpen(true); }}
+                    onDelete={handleBudgetDelete}
+                    onAdd={() => { setEditingBudget(null); setIsBudgetFormOpen(true); }}
+                  />
+              )}
+            </div>
           </div>
 
         </div>
@@ -186,6 +192,8 @@ export default function Monitoring() {
             onSubmit={handleGoalSubmit}
             onCancel={() => setIsGoalFormOpen(false)}
             loading={isSubmittingGoal}
+            cards={cards}
+            wallets={wallets}
         />
       )}
     </Layout>
