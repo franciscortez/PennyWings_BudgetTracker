@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../Icon';
 import { useCategories } from '../../hooks/useCategories';
-import { motion as Motion, AnimatePresence } from 'motion/react';
 import { getToast } from '../../utils/toast';
 import { useTheme } from '../../contexts/ThemeContext';
 

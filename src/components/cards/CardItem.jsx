@@ -1,6 +1,5 @@
 import React from 'react'
 import Icon from '../Icon'
-import { motion as Motion } from 'motion/react'
 import { useTheme } from '../../contexts/ThemeContext'
 import CardChip from './CardChip'
 
@@ -10,15 +9,11 @@ export default function CardItem({ card, onEdit, onDelete }) {
   const bgColor = card.color || '#F472B6' // Default pink-400
 
   return (
-    <Motion.div 
-      whileHover={{ y: -5 }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white dark:bg-dark-card p-6 rounded-[2.5rem] border border-pink-50 dark:border-dark-border relative overflow-hidden group transition-all duration-300 flex flex-col"
+    <div 
+      className="bg-white dark:bg-dark-card p-6 rounded-[2.5rem] border border-pink-50 dark:border-dark-border relative overflow-hidden group transition-all duration-300 flex flex-col sm:hover:-translate-y-2 animate-scale-in"
     >
-      <Motion.div 
-        whileHover={{ scale: 1.02 }}
-        className="relative h-48 rounded-[2rem] p-6 overflow-hidden mb-4 cursor-pointer"
+      <div 
+        className="relative h-48 rounded-[2rem] p-6 overflow-hidden mb-4 cursor-pointer transition-transform duration-300 sm:hover:scale-[1.02]"
         style={{ 
           background: `linear-gradient(135deg, ${bgColor}, ${bgColor}dd)`,
           color: card.text_color || '#FFFFFF'
@@ -61,7 +56,7 @@ export default function CardItem({ card, onEdit, onDelete }) {
             </div>
           </div>
         </div>
-      </Motion.div>
+      </div>
       
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
@@ -86,6 +81,6 @@ export default function CardItem({ card, onEdit, onDelete }) {
           style={{ backgroundColor: card.is_active !== false ? '#10B981' : '#EF4444' }}
         ></div>
       </div>
-    </Motion.div>
+    </div>
   )
 }

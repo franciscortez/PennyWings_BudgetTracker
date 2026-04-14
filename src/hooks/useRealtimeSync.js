@@ -22,7 +22,7 @@ export const useRealtimeSync = () => {
         table: 'bank_cards', 
         filter: `user_id=eq.${user.id}` 
       }, () => {
-        queryClient.invalidateQueries({ queryKey: ['bank_cards', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['bank_cards', user.id], refetchType: 'active' });
       })
       .on('postgres_changes', { 
         event: '*', 
@@ -30,7 +30,7 @@ export const useRealtimeSync = () => {
         table: 'e_wallets', 
         filter: `user_id=eq.${user.id}` 
       }, () => {
-        queryClient.invalidateQueries({ queryKey: ['e_wallets', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['e_wallets', user.id], refetchType: 'active' });
       })
       .on('postgres_changes', { 
         event: '*', 
@@ -38,10 +38,10 @@ export const useRealtimeSync = () => {
         table: 'transactions', 
         filter: `user_id=eq.${user.id}` 
       }, () => {
-        queryClient.invalidateQueries({ queryKey: ['transactions', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['recent_transactions', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['monthly_stats', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['report_transactions', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['transactions', user.id], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['recent_transactions', user.id], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['monthly_stats', user.id], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['report_transactions', user.id], refetchType: 'active' });
       })
       .on('postgres_changes', { 
         event: '*', 
@@ -49,8 +49,8 @@ export const useRealtimeSync = () => {
         table: 'budgets', 
         filter: `user_id=eq.${user.id}` 
       }, () => {
-        queryClient.invalidateQueries({ queryKey: ['budgets', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['budget_stats', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['budgets', user.id], refetchType: 'active' });
+        queryClient.invalidateQueries({ queryKey: ['budget_stats', user.id], refetchType: 'active' });
       })
       .on('postgres_changes', { 
         event: '*', 
@@ -58,7 +58,7 @@ export const useRealtimeSync = () => {
         table: 'goals', 
         filter: `user_id=eq.${user.id}` 
       }, () => {
-        queryClient.invalidateQueries({ queryKey: ['goals', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['goals', user.id], refetchType: 'active' });
       })
       .subscribe();
 

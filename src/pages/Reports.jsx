@@ -160,7 +160,7 @@ export default function Reports() {
                 <select
                   value={filterProvider}
                   onChange={(e) => setFilterProvider(e.target.value)}
-                  className="w-full sm:w-auto appearance-none pl-5 pr-12 py-3 bg-white/80 dark:bg-dark-card/80 backdrop-blur-xl border border-pink-100 dark:border-dark-border rounded-[2rem] text-sm font-bold text-gray-700 dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-300 transition-all cursor-pointer"
+                  className="w-full sm:w-auto appearance-none pl-5 pr-12 py-3 bg-white/80 dark:bg-dark-card/80 backdrop-blur-sm border border-pink-100 dark:border-dark-border rounded-[2rem] text-sm font-bold text-gray-700 dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-300 transition-all cursor-pointer"
                 >
                   <option value="all">All Accounts</option>
                   {availableProviders.map(p => (
@@ -178,7 +178,7 @@ export default function Reports() {
               <select
                 value={timeframe}
                 onChange={(e) => setTimeframe(e.target.value)}
-                className="w-full sm:w-auto appearance-none pl-5 pr-10 py-3 bg-white/80 dark:bg-dark-card/80 backdrop-blur-xl border border-pink-100 dark:border-dark-border rounded-[2rem] text-sm font-bold text-pink-600 dark:text-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-300 transition-all cursor-pointer"
+                className="w-full sm:w-auto appearance-none pl-5 pr-10 py-3 bg-white/80 dark:bg-dark-card/80 backdrop-blur-md border border-pink-100 dark:border-dark-border rounded-[2rem] text-sm font-bold text-pink-600 dark:text-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-300 transition-all cursor-pointer"
               >
                 <option value="week">This Week</option>
                 <option value="month">This Month</option>

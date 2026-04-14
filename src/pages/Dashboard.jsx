@@ -8,17 +8,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useGoals } from "../hooks/useGoals";
 import { useBudgets } from "../hooks/useBudgets";
 import { useBudgetStats } from "../hooks/useBudgetStats";
-import { motion as Motion, AnimatePresence } from "motion/react";
 
-const staggerContainer = {
-  initial: {},
-  animate: { transition: { staggerChildren: 0.05 } }
-};
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 }
-};
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -76,7 +66,7 @@ export default function Dashboard() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-10 translate-y-[-20px] blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6 md:mb-8">
-                <div className="p-2 sm:p-3 bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/30">
+                <div className="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/30">
                   <Icon name="bank" color="white" className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
                 <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] opacity-80">Total Net Worth</p>
@@ -231,47 +221,38 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : transactions?.length > 0 ? (
-              <Motion.div 
-                variants={staggerContainer}
-                initial="initial"
-                animate="animate"
-                className="space-y-6"
-              >
-                <AnimatePresence mode="popLayout">
-                  {transactions.map(tx => (
-                    <Motion.div 
-                      key={tx?.id} 
-                      variants={fadeInUp}
-                      layout
-                      className="flex items-center gap-3 sm:gap-5 p-4 sm:p-5 bg-white dark:bg-dark-bg border border-pink-50 dark:border-dark-border rounded-[2rem] sm:rounded-[2.5rem] sm:hover:translate-x-2 transition-all group overflow-hidden"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-base sm:text-lg font-black text-gray-900 dark:text-dark-text truncate tracking-tight">{tx?.description || tx?.category?.name || 'Uncategorized'}</p>
-                        <p className="text-[10px] sm:text-sm font-bold text-gray-400 dark:text-dark-muted flex flex-wrap items-center gap-1 sm:gap-2 uppercase tracking-widest">
-                          <span className="truncate max-w-[100px] sm:max-w-none">{tx?.category?.name || 'No Category'}</span> 
-                          <span className="hidden sm:inline">•</span> 
-                          <span className="shrink-0">{tx?.transaction_date ? new Date(tx.transaction_date).toLocaleDateString() : 'No Date'}</span>
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0 ml-2">
-                        <p className={`text-lg sm:text-xl font-black tracking-tighter ${
-                          tx?.type === 'income' ? 'text-emerald-500' : 
-                          tx?.type === 'expense' ? 'text-rose-500' : 
-                          tx?.type === 'transfer' ? 'text-blue-500' :
-                          'text-orange-500'
-                        }`}>
-                          {tx?.type === 'income' ? '+' : tx?.type === 'transfer' ? '' : '-'}₱{Number(tx?.amount || 0).toLocaleString()}
-                        </p>
-                        <p className="text-[9px] sm:text-[10px] font-black text-gray-300 dark:text-dark-muted/50 uppercase tracking-tighter truncate max-w-[70px] sm:max-w-[120px] ml-auto">
-                          {tx?.type === 'transfer' 
-                            ? `${tx.card?.card_name || tx.wallet?.wallet_name || 'Account'} → ${tx.to_card?.card_name || tx.to_wallet?.wallet_name || 'Account'}`
-                            : tx?.card?.card_name || tx?.wallet?.wallet_name || 'Cash'}
-                        </p>
-                      </div>
-                    </Motion.div>
-                  ))}
-                </AnimatePresence>
-              </Motion.div>
+              <div className="space-y-6">
+                {transactions.map(tx => (
+                  <div 
+                    key={tx?.id} 
+                    className="flex items-center gap-3 sm:gap-5 p-4 sm:p-5 bg-white dark:bg-dark-bg border border-pink-50 dark:border-dark-border rounded-[2rem] sm:rounded-[2.5rem] sm:hover:translate-x-2 transition-all group overflow-hidden"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base sm:text-lg font-black text-gray-900 dark:text-dark-text truncate tracking-tight">{tx?.description || tx?.category?.name || 'Uncategorized'}</p>
+                      <p className="text-[10px] sm:text-sm font-bold text-gray-400 dark:text-dark-muted flex flex-wrap items-center gap-1 sm:gap-2 uppercase tracking-widest">
+                        <span className="truncate max-w-[100px] sm:max-w-none">{tx?.category?.name || 'No Category'}</span> 
+                        <span className="hidden sm:inline">•</span> 
+                        <span className="shrink-0">{tx?.transaction_date ? new Date(tx.transaction_date).toLocaleDateString() : 'No Date'}</span>
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0 ml-2">
+                      <p className={`text-lg sm:text-xl font-black tracking-tighter ${
+                        tx?.type === 'income' ? 'text-emerald-500' : 
+                        tx?.type === 'expense' ? 'text-rose-500' : 
+                        tx?.type === 'transfer' ? 'text-blue-500' :
+                        'text-orange-500'
+                      }`}>
+                        {tx?.type === 'income' ? '+' : tx?.type === 'transfer' ? '' : '-'}₱{Number(tx?.amount || 0).toLocaleString()}
+                      </p>
+                      <p className="text-[9px] sm:text-[10px] font-black text-gray-300 dark:text-dark-muted/50 uppercase tracking-tighter truncate max-w-[70px] sm:max-w-[120px] ml-auto">
+                        {tx?.type === 'transfer' 
+                          ? `${tx.card?.card_name || tx.wallet?.wallet_name || 'Account'} → ${tx.to_card?.card_name || tx.to_wallet?.wallet_name || 'Account'}`
+                          : tx?.card?.card_name || tx?.wallet?.wallet_name || 'Cash'}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="py-20 text-center bg-pink-50/30 dark:bg-dark-bg/30 rounded-[3rem] border-2 border-dashed border-pink-100 dark:border-dark-border">
                 <p className="text-gray-500 dark:text-dark-muted font-black uppercase tracking-widest mb-2">No Transactions Yet</p>

@@ -5,7 +5,7 @@ import Icon from "../components/Icon";
 import { useTheme } from "../contexts/ThemeContext";
 import { getToast } from "../utils/toast";
 import { getConfirm, confirmPresets } from "../utils/confirm";
-import { AnimatePresence } from "motion/react"
+
 
 export default function Profile() {
   const { user, profile, updateProfile, updatePassword, deleteAccount } = useAuth();
@@ -169,7 +169,7 @@ export default function Profile() {
 
           {/* Content Area */}
           <div className="flex-1 min-w-0">
-            <AnimatePresence mode="wait">
+
               {activeTab === "details" && (
                 <div
                   key="details"
@@ -315,7 +315,7 @@ export default function Profile() {
                   </button>
                 </div>
               )}
-            </AnimatePresence>
+
           </div>
         </div>
       </div>

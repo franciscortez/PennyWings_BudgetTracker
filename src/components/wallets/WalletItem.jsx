@@ -1,6 +1,5 @@
 import React from 'react'
 import Icon from '../Icon'
-import { motion as Motion } from 'motion/react'
 import { useTheme } from '../../contexts/ThemeContext'
 
 export default function WalletItem({ wallet, onEdit, onDelete }) {
@@ -9,17 +8,11 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
   const bgColor = wallet.color || '#FFB6C1'
   
   return (
-    <Motion.div 
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ y: -5 }}
-      className="bg-white dark:bg-dark-card rounded-[2.5rem] p-6 border border-pink-50 dark:border-dark-border relative overflow-hidden group transition-all duration-300"
+    <div 
+      className="bg-white dark:bg-dark-card rounded-[2.5rem] p-6 border border-pink-50 dark:border-dark-border relative overflow-hidden group transition-all duration-300 sm:hover:-translate-y-2 animate-scale-in"
     >
-      <Motion.div 
-        whileHover={{ scale: 1.02 }}
-        className="relative h-48 rounded-[2rem] p-6 overflow-hidden mb-4 cursor-pointer"
+      <div 
+        className="relative h-48 rounded-[2rem] p-6 overflow-hidden mb-4 cursor-pointer transition-transform duration-300 sm:hover:scale-[1.02]"
         style={{ 
           background: `linear-gradient(135deg, ${bgColor}, ${bgColor}DD)`,
           color: wallet.text_color || '#FFFFFF'
@@ -38,12 +31,11 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
                 {wallet.wallet_name}
               </h3>
             </div>
-            <Motion.div 
-              whileHover={{ rotate: -15 }}
-              className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2"
+            <div 
+              className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2 transition-transform duration-300 sm:hover:-rotate-12"
             >
               <Icon name={wallet.wallet_type === 'cash' ? 'cash' : 'wallet'} color="currentColor" />
-            </Motion.div>
+            </div>
           </div>
           
           <div className="mt-auto">
@@ -60,7 +52,7 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
             </div>
           </div>
         </div>
-      </Motion.div>
+      </div>
       
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
@@ -85,6 +77,6 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
           style={{ backgroundColor: wallet.is_active !== false ? '#10B981' : '#EF4444' }}
         ></div>
       </div>
-    </Motion.div>
+    </div>
   )
 }

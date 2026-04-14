@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react'
 import Icon from '../Icon'
-import { motion as Motion, AnimatePresence } from 'motion/react'
+
 import { useTheme } from '../../contexts/ThemeContext'
 import { getToast } from '../../utils/toast'
 
@@ -32,11 +32,7 @@ const TEXT_COLOR_OPTIONS = [
   '#FCE7F3', '#FBCFE8', '#FEE2E2'
 ]
 
-const stepVariants = {
-  initial: { opacity: 0, x: 10 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, x: -10, transition: { duration: 0.15, ease: 'easeIn' } }
-}
+
 
 // Memoized individual color swatch to avoid re-rendering all swatches on every state change
 const ColorSwatch = memo(({ color, isSelected, onClick }) => (
@@ -304,9 +300,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
     }
   }, [formData, onSubmit, onClose])
 
-  return (
-    <AnimatePresence initial={false}>
-      {isOpen && (
+  return isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             onClick={onClose}
@@ -386,7 +380,5 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
             </div>
           </div>
         </div>
-      )}
-    </AnimatePresence>
   )
 }

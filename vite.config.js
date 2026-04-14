@@ -24,8 +24,11 @@ export default defineConfig({
             if (id.includes('@supabase/supabase-js')) {
               return 'vendor-supabase';
             }
-            if (id.includes('motion') || id.includes('lucide-react') || id.includes('sweetalert2')) {
-              return 'vendor-ui';
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('sweetalert2')) {
+              return 'vendor-alerts';
             }
             if (id.includes('recharts') || id.includes('date-fns')) {
               return 'vendor-charts';

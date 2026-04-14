@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { AnimatePresence } from 'motion/react';
+
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useBudgets } from '../../hooks/useBudgets';
 import { useBudgetStats } from '../../hooks/useBudgetStats';
@@ -118,9 +118,7 @@ export default function AIChatWindow({ isOpen, onClose }) {
     }
   };
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
+  return isOpen && (
         <div className="hidden md:flex fixed bottom-6 right-6 w-96 h-[600px] max-h-[70vh] bg-white dark:bg-dark-card border border-pink-100 dark:border-dark-border rounded-[2.5rem] shadow-2xl flex-col overflow-hidden z-[60] animate-scale-in">
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-pink-500 to-pink-600 text-white flex justify-between items-center shrink-0">
@@ -196,7 +194,5 @@ export default function AIChatWindow({ isOpen, onClose }) {
             </div>
           </div>
         </div>
-      )}
-    </AnimatePresence>
-  );
+    );
 }

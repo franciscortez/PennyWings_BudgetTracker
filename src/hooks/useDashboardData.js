@@ -20,6 +20,7 @@ export const useDashboardData = (txLimit = 5) => {
       return data || []
     },
     enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 
   // 2. Fetch Wallets
@@ -35,6 +36,7 @@ export const useDashboardData = (txLimit = 5) => {
       return data || []
     },
     enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 
   // 3. Fetch Recent Transactions
@@ -60,6 +62,7 @@ export const useDashboardData = (txLimit = 5) => {
       return data || []
     },
     enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 
   // 4. Fetch Monthly Stats
@@ -88,30 +91,11 @@ export const useDashboardData = (txLimit = 5) => {
       }, { income: 0, expenses: 0 })
     },
     enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 
-  // Set up real-time subscriptions for cache invalidation
-  useEffect(() => {
-    if (user) {
-      const channel = supabase
-        .channel('dashboard_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'bank_cards', filter: `user_id=eq.${user.id}` }, () => {
-          queryClient.invalidateQueries({ queryKey: ['bank_cards', user.id] })
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'e_wallets', filter: `user_id=eq.${user.id}` }, () => {
-          queryClient.invalidateQueries({ queryKey: ['e_wallets', user.id] })
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => {
-          queryClient.invalidateQueries({ queryKey: ['recent_transactions', user.id] })
-          queryClient.invalidateQueries({ queryKey: ['monthly_stats', user.id] })
-        })
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(channel);
-      }
-    }
-  }, [user, queryClient])
+  // Removed redundant local real-time subscription as it's now handled centrally
+  // in Layout via useRealtimeSync. This prevents duplicate network channels.
 
   return {
     cards: cardsQuery.data || [],

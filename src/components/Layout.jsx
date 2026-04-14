@@ -8,7 +8,6 @@ import { startOfMonth, endOfMonth, format } from "date-fns";
 import Icon from "./Icon";
 import { getConfirm, confirmPresets } from "../utils/confirm";
 import AnimatedPage from "./common/AnimatedPage";
-import { motion as Motion, AnimatePresence } from "motion/react";
 
 // Navigation config - defined outside component to prevent recreation
 const navigation = [
@@ -268,68 +267,66 @@ export default function Layout({ children }) {
         </div>
 
         {/* More Menu Dropdown */}
-        <AnimatePresence>
-          {isMoreMenuOpen && (
-            <>
-              <div
-                onClick={() => setIsMoreMenuOpen(false)}
-                className="fixed inset-0 bg-black/40 z-40 animate-fade-in"
-              />
-              <div
-                className="absolute bottom-full left-0 right-0 mb-2 mx-2 bg-white dark:bg-dark-card rounded-3xl border border-pink-100 dark:border-dark-border shadow-2xl overflow-hidden z-50 animate-slide-up"
-              >
-                <div className="p-2 space-y-1">
-                  {/* Other Navigation Items */}
-                  {navigation.filter(item => !item.showInMobile).map((item) => {
-                    const isActive = location.pathname === item.href;
-                    return (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        onClick={() => setIsMoreMenuOpen(false)}
-                        className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${
-                          isActive 
-                            ? "bg-pink-50 dark:bg-dark-border text-pink-600 dark:text-pink-400" 
-                            : "text-gray-700 dark:text-dark-text hover:bg-pink-50/50 dark:hover:bg-dark-border/50"
-                        }`}
-                      >
-                        <Icon name={item.icon} color="currentColor" className="w-6 h-6" />
-                        <span className="text-sm font-bold">{item.name}</span>
-                      </Link>
-                    );
-                  })}
-                  
-                  {/* Divider */}
-                  <div className="h-px bg-pink-100 dark:bg-dark-border my-2"></div>
-                  
-                  {/* Theme Toggle in More Menu */}
-                  <button
-                    onClick={() => {
-                      toggleTheme();
-                      setIsMoreMenuOpen(false);
-                    }}
-                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all text-gray-700 dark:text-dark-text hover:bg-pink-50/50 dark:hover:bg-dark-border/50"
-                  >
-                    <Icon name={theme === 'light' ? 'moon' : 'sun'} color="currentColor" className="w-6 h-6" />
-                    <span className="text-sm font-bold">{theme === 'light' ? 'Dark' : 'Light'} Mode</span>
-                  </button>
-                  
-                  {/* Logout in More Menu */}
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all text-rose-600 dark:text-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-900/20"
-                  >
-                    <Icon name="logout" color="currentColor" className="w-6 h-6" />
-                    <span className="text-sm font-bold">Sign Out</span>
-                  </button>
-                </div>
+        {isMoreMenuOpen && (
+          <>
+            <div
+              onClick={() => setIsMoreMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 z-40 animate-fade-in"
+            />
+            <div
+              className="absolute bottom-full left-0 right-0 mb-2 mx-2 bg-white dark:bg-dark-card rounded-3xl border border-pink-100 dark:border-dark-border shadow-2xl overflow-hidden z-50 animate-slide-up"
+            >
+              <div className="p-2 space-y-1">
+                {/* Other Navigation Items */}
+                {navigation.filter(item => !item.showInMobile).map((item) => {
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setIsMoreMenuOpen(false)}
+                      className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${
+                        isActive 
+                          ? "bg-pink-50 dark:bg-dark-border text-pink-600 dark:text-pink-400" 
+                          : "text-gray-700 dark:text-dark-text hover:bg-pink-50/50 dark:hover:bg-dark-border/50"
+                      }`}
+                    >
+                      <Icon name={item.icon} color="currentColor" className="w-6 h-6" />
+                      <span className="text-sm font-bold">{item.name}</span>
+                    </Link>
+                  );
+                })}
+                
+                {/* Divider */}
+                <div className="h-px bg-pink-100 dark:bg-dark-border my-2"></div>
+                
+                {/* Theme Toggle in More Menu */}
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                    setIsMoreMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all text-gray-700 dark:text-dark-text hover:bg-pink-50/50 dark:hover:bg-dark-border/50"
+                >
+                  <Icon name={theme === 'light' ? 'moon' : 'sun'} color="currentColor" className="w-6 h-6" />
+                  <span className="text-sm font-bold">{theme === 'light' ? 'Dark' : 'Light'} Mode</span>
+                </button>
+                
+                {/* Logout in More Menu */}
+                <button
+                  onClick={() => {
+                    setIsMoreMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all text-rose-600 dark:text-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-900/20"
+                >
+                  <Icon name="logout" color="currentColor" className="w-6 h-6" />
+                  <span className="text-sm font-bold">Sign Out</span>
+                </button>
               </div>
-            </>
-          )}
-        </AnimatePresence>
+            </div>
+          </>
+        )}
       </nav>
     </div>
   );

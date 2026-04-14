@@ -11,7 +11,6 @@ import WalletList from '../components/wallets/WalletList'
 import AccountWizard from '../components/accounts/AccountWizard'
 import EditAccountModal from '../components/accounts/EditAccountModal'
 import Icon from '../components/Icon'
-import { motion as Motion, AnimatePresence } from 'motion/react'
 
 export default function Accounts() {
   const { theme } = useTheme()
@@ -162,7 +161,7 @@ export default function Accounts() {
 
       {/* Search & Tabs */}
       <div className="flex flex-col md:flex-row gap-4 mb-10 items-center justify-between">
-        <div className="flex gap-2 p-1.5 bg-pink-100/30 dark:bg-dark-card/30 backdrop-blur-md rounded-[2rem] border border-pink-100 dark:border-dark-border w-full overflow-x-auto no-scrollbar md:w-fit whitespace-nowrap snap-x">
+        <div className="flex gap-2 p-1.5 bg-pink-100/30 dark:bg-dark-card/30 backdrop-blur-sm rounded-[2rem] border border-pink-100 dark:border-dark-border w-full overflow-x-auto no-scrollbar md:w-fit whitespace-nowrap snap-x">
           {['all', 'cards', 'wallets', 'cash'].map((tab) => (
             <button
               key={tab}

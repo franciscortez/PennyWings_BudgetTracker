@@ -1,7 +1,6 @@
 import React from 'react';
 import Icon from '../Icon';
 import ProgressBar from '../common/ProgressBar';
-import { motion as Motion } from 'motion/react';
 
 const BudgetItem = ({ budget, spent = 0, onEdit, onDelete }) => {
   const percentage = budget.limit_amount > 0 ? (spent / budget.limit_amount) * 100 : 0;
@@ -9,11 +8,8 @@ const BudgetItem = ({ budget, spent = 0, onEdit, onDelete }) => {
   const remaining = budget.limit_amount - spent;
 
   return (
-    <Motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white dark:bg-dark-card rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-6 border border-pink-50 dark:border-dark-border shadow-sm hover:shadow-md transition-all group"
+    <div
+      className="bg-white dark:bg-dark-card rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-6 border border-pink-50 dark:border-dark-border shadow-sm hover:shadow-md transition-all group animate-scale-in"
     >
 
       <div className="flex justify-between items-start mb-6">
@@ -71,7 +67,7 @@ const BudgetItem = ({ budget, spent = 0, onEdit, onDelete }) => {
           </span>
         </div>
       </div>
-    </Motion.div>
+    </div>
   );
 };
 

@@ -16,7 +16,7 @@ export default React.memo(function SpendingChart({ data = [] }) {
   const isDark = theme === 'dark';
 
   return (
-    <div className="bg-white/80 dark:bg-dark-card/80 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-pink-50 dark:border-dark-border h-[450px] flex flex-col group transition-all">
+    <div className="bg-white/80 dark:bg-dark-card/80 backdrop-blur-md p-8 md:p-10 rounded-[3rem] border border-pink-50 dark:border-dark-border h-[450px] flex flex-col group transition-all">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
         <div>
           <div className="flex items-center gap-2 mb-1">

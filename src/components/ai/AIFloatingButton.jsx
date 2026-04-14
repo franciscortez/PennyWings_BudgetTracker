@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AnimatePresence } from 'motion/react';
+
 import Icon from '../Icon';
 import AIChatWindow from './AIChatWindow';
 
@@ -9,7 +9,7 @@ export default function AIFloatingButton() {
   return (
     <>
       <AIChatWindow isOpen={isOpen} onClose={() => setIsOpen(false)} />
-      <AnimatePresence>
+
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
@@ -24,7 +24,7 @@ export default function AIFloatingButton() {
             </div>
           </button>
         )}
-      </AnimatePresence>
+
     </>
   );
 }

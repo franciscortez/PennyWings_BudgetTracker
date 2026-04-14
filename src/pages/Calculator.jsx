@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../components/Layout';
-import { motion as Motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon';
 
 export default function Calculator() {
@@ -179,62 +178,39 @@ export default function Calculator() {
     const isActive = activeKey === (keyboardKey || label);
 
     return (
-      <Motion.button 
-        whileTap={{ scale: 0.92 }}
-        whileHover={{ scale: 1.05, y: -2 }}
-        animate={isActive ? { scale: 0.92 } : { scale: 1 }}
+      <button 
         onClick={onClick}
-        className={`${baseStyle} ${variants[variant]} ${className} ${isActive ? 'ring-4 ring-pink-400/50' : ''}`}
+        className={`${baseStyle} ${variants[variant]} ${className} ${isActive ? 'ring-4 ring-pink-400/50 scale-95' : 'active:scale-95 sm:hover:scale-105 sm:hover:-translate-y-1'}`}
       >
         {icon ? <Icon name={icon} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" /> : label}
-      </Motion.button>
+      </button>
     );
   };
 
   return (
     <Layout>
-      <Motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8 text-center md:text-left"
-      >
+      <div className="mb-8 text-center md:text-left">
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">Calculator</h1>
         <p className="text-gray-500 dark:text-dark-muted">Quick calculations for your budgets and expenses.</p>
-      </Motion.div>
+      </div>
 
       <div className="max-w-md mx-auto w-full px-2 sm:px-0 pb-20">
-        <Motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
-          className="bg-white/80 dark:bg-dark-card/80 backdrop-blur-xl rounded-[2rem] md:rounded-[3rem] p-4 sm:p-5 md:p-6 border border-pink-100 dark:border-dark-border"
-        >
+        <div className="bg-white/80 dark:bg-dark-card/80 backdrop-blur-md rounded-[2rem] md:rounded-[3rem] p-4 sm:p-5 md:p-6 border border-pink-100 dark:border-dark-border animate-scale-in">
+
           {/* Display Area */}
           <div className="bg-pink-50/50 dark:bg-dark-bg border border-pink-100 dark:border-dark-border rounded-3xl md:rounded-[2rem] p-5 md:p-6 mb-4 sm:mb-6 flex flex-col items-end justify-center min-h-[120px] sm:min-h-[140px] md:min-h-[160px] relative overflow-hidden">
             {/* Decorative blob */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-400/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
             
-            <AnimatePresence mode="wait">
-              <Motion.div 
-                key={equation}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="text-pink-400/80 dark:text-dark-muted text-sm font-bold tracking-wider mb-2 h-5"
-              >
-                {equation}
-              </Motion.div>
-            </AnimatePresence>
+            <div className="text-pink-400/80 dark:text-dark-muted text-sm font-bold tracking-wider mb-2 h-5">
+              {equation}
+            </div>
             
-            <Motion.div 
-              key={display}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            <div 
               className={`font-black text-gray-800 dark:text-white tracking-tighter w-full text-right overflow-hidden overflow-ellipsis ${display.length > 9 ? 'text-3xl sm:text-4xl md:text-5xl' : 'text-4xl sm:text-5xl md:text-7xl'}`}
             >
               {display}
-            </Motion.div>
+            </div>
           </div>
 
           {/* Keypad */}
@@ -263,7 +239,7 @@ export default function Calculator() {
             <Button label="." onClick={inputDot} />
             <Button label="=" onClick={handleEqual} variant="primary" />
           </div>
-        </Motion.div>
+        </div>
       </div>
     </Layout>
   );

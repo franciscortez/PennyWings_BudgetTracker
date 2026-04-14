@@ -8,22 +8,7 @@ import SkeletonLoader from "../components/common/SkeletonLoader";
 import { useTheme } from "../contexts/ThemeContext";
 import { getToast } from "../utils/toast";
 import { getConfirm, confirmPresets } from "../utils/confirm";
-import { motion as Motion, AnimatePresence } from "motion/react";
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
-};
-
-const staggerContainer = {
-  initial: {},
-  animate: {
-    transition: {
-      staggerChildren: 0.05,
-    }
-  }
-};
 
 export default function Transactions() {
   const { theme } = useTheme();
@@ -234,20 +219,12 @@ export default function Transactions() {
                     <th className="px-8 py-6 text-[10px] font-black text-gray-400 dark:text-dark-muted uppercase tracking-[0.2em] text-center">Action</th>
                   </tr>
                 </thead>
-                <Motion.tbody 
-                  variants={staggerContainer}
-                  initial={false}
-                  animate="animate"
-                  className="divide-y divide-pink-50 dark:divide-dark-border"
-                >
-                  <AnimatePresence mode="popLayout">
-                    {transactions.map(tx => (
-                      <Motion.tr 
-                        key={tx.id} 
-                        variants={fadeInUp}
-                        layout
-                        className="group hover:bg-pink-50/30 dark:hover:bg-dark-bg/30 transition-colors"
-                      >
+                <tbody className="divide-y divide-pink-50 dark:divide-dark-border">
+                  {transactions.map(tx => (
+                    <tr 
+                      key={tx.id} 
+                      className="group hover:bg-pink-50/30 dark:hover:bg-dark-bg/30 transition-colors"
+                    >
                         <td className="px-8 py-6">
                           <div>
                             <p className="font-black text-gray-900 dark:text-dark-text tracking-tight leading-none mb-1">{tx.description || tx.category?.name}</p>
@@ -315,10 +292,9 @@ export default function Transactions() {
                             </button>
                           </div>
                         </td>
-                      </Motion.tr>
-                    ))}
-                  </AnimatePresence>
-                </Motion.tbody>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </div>
           ) : (
@@ -337,15 +313,13 @@ export default function Transactions() {
                 Showing <span className="text-pink-500 dark:text-pink-400">{(page - 1) * pageSize + 1}</span> to <span className="text-pink-500 dark:text-pink-400">{Math.min(page * pageSize, totalCount)}</span> of {totalCount}
               </p>
               <div className="flex gap-2">
-                <Motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   onClick={() => onPageChange(Math.max(1, page - 1))}
                   disabled={page === 1}
                   className="p-3 rounded-xl bg-white dark:bg-dark-card border border-pink-100 dark:border-dark-border text-gray-400 dark:text-dark-muted hover:text-pink-500 hover:border-pink-200 dark:hover:border-dark-muted transition-all disabled:opacity-30"
                 >
                   <Icon name="arrowLeft" className="w-4 h-4" />
-                </Motion.button>
+                </button>
                 <div className="hidden sm:flex gap-1">
                   {[...Array(totalPages)].map((_, i) => {
                     const p = i + 1;
@@ -357,10 +331,8 @@ export default function Transactions() {
                       }
                     }
                     return (
-                      <Motion.button
+                      <button
                         key={p}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
                         onClick={() => onPageChange(p)}
                         className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
                           page === p
@@ -369,19 +341,17 @@ export default function Transactions() {
                         }`}
                       >
                         {p}
-                      </Motion.button>
+                      </button>
                     );
                   })}
                 </div>
-                <Motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
                   className="p-3 rounded-xl bg-white dark:bg-dark-card border border-pink-100 dark:border-dark-border text-gray-400 dark:text-dark-muted hover:text-pink-500 hover:border-pink-200 dark:hover:border-dark-muted transition-all rotate-180 disabled:opacity-30"
                 >
                   <Icon name="arrowLeft" className="w-4 h-4" />
-                </Motion.button>
+                </button>
               </div>
             </div>
           )}

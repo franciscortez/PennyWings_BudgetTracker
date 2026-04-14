@@ -1,7 +1,6 @@
 import React from 'react';
 import Icon from '../Icon';
 import ProgressBar from '../common/ProgressBar';
-import { motion as Motion } from 'motion/react';
 import { format, differenceInDays } from 'date-fns';
 
 const GoalItem = ({ goal, onEdit, onDelete }) => {
@@ -10,11 +9,8 @@ const GoalItem = ({ goal, onEdit, onDelete }) => {
   const daysLeft = goal.target_date ? differenceInDays(new Date(goal.target_date), new Date()) : null;
 
   return (
-    <Motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-dark-card rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border border-pink-50 dark:border-dark-border shadow-sm hover:shadow-xl transition-all group relative overflow-hidden"
+    <div
+      className="bg-white dark:bg-dark-card rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border border-pink-50 dark:border-dark-border shadow-sm hover:shadow-xl transition-all group relative overflow-hidden animate-scale-in"
     >
 
       {isCompleted && (
@@ -101,7 +97,7 @@ const GoalItem = ({ goal, onEdit, onDelete }) => {
           )}
         </div>
       </div>
-    </Motion.div>
+    </div>
   );
 };
 
